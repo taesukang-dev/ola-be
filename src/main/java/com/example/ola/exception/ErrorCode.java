@@ -11,6 +11,8 @@ public enum ErrorCode {
     DUPLICATED_MEMBER(HttpStatus.CONFLICT, "User name is duplicated"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad request"),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "invalid password"),
+    UNAUTHORIZED_BEHAVIOR(HttpStatus.UNAUTHORIZED, "Unauthorized behavior"),
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
     ;
 
     private HttpStatus status;

@@ -14,32 +14,32 @@ import java.time.Instant;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE user SET DELETED_AT = NOW() where id = ?")
 @Where(clause = "deleted_at is null")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DTYPE")
 @Entity
-public class User {
+public class Post {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String password;
-    private String nickname;
-    private String name;
-    private Long ageRange;
-    private String homeGym;
-    @Enumerated(EnumType.STRING) private UserRole role = UserRole.USER;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private User user;
+    private String title;
+    private String content;
+    // TODO : COMMENT 추가할 것
+    // TODO : Image 추가할 것
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
-    public User(String username, String password, String nickname, String name, Long ageRange, String homeGym) {
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.name = name;
-        this.ageRange = ageRange;
-        this.homeGym = homeGym;
+    public Post (User user, String title, String content) {
+        this.user = user;
+        this.title = title;
+        this.content = content;
     }
 
-    public static User of(String username, String password, String nickname, String name, Long ageRange, String homeGym) {
-        return new User(username, password, nickname, name, ageRange, homeGym);
+    public static Post of(User user, String title, String content) {
+        return new Post(user, title, content);
     }
 
     @PrePersist void registeredAt() { this.registeredAt = Timestamp.from(Instant.now()); }
