@@ -1,20 +1,29 @@
 package com.example.ola.service;
 
 import com.example.ola.domain.User;
+import com.example.ola.domain.UserRole;
 import com.example.ola.dto.UserDto;
 import com.example.ola.dto.request.UserRequest;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
+import com.example.ola.jwt.JwtTokenProvider;
 import com.example.ola.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public UserDto join(UserRequest userRequest) {
@@ -25,11 +34,19 @@ public class UserService {
                 userRepository.save(
                         User.of(
                                 userRequest.getUsername(),
-                                userRequest.getPassword(),
+                                passwordEncoder.encode(userRequest.getPassword()),
                                 userRequest.getNickname(),
                                 userRequest.getName(),
                                 userRequest.getAgeRange(),
                                 userRequest.getHomeGym())));
+    }
+
+    public String login(String username, String password) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new OlaApplicationException(ErrorCode.INVALID_PASSWORD);
+        }
+        return jwtTokenProvider.createToken(username, List.of(UserRole.USER.name()));
     }
 
     public UserDto findByUserName(String username) {
