@@ -22,14 +22,14 @@ public class User {
     private String password;
     private String nickname;
     private String name;
-    private int ageRange;
+    private Long ageRange;
     private String homeGym;
     private UserRole role = UserRole.USER;
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
-    public User(String username, String password, String nickname, String name, int ageRange, String homeGym) {
+    public User(String username, String password, String nickname, String name, Long ageRange, String homeGym) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
@@ -38,7 +38,7 @@ public class User {
         this.homeGym = homeGym;
     }
 
-    public static User of(String username, String password, String nickname, String name, int ageRange, String homeGym) {
+    public static User of(String username, String password, String nickname, String name, Long ageRange, String homeGym) {
         return new User(username, password, nickname, name, ageRange, homeGym);
     }
 
