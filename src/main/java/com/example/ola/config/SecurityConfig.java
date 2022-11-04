@@ -7,6 +7,7 @@ import com.example.ola.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,22 +43,14 @@ public class SecurityConfig {
                 .authorizeRequests(
                         auth -> auth
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-//                                .mvcMatchers(
-//                                        HttpMethod.GET,
-//                                        "/api/posts/post/**",
-//                                        "/api/posts/list",
-//                                        "/ws-stomp/**",
-//                                        "/ws-stomp",
-//                                        "/ws-stomp/chat").permitAll()
-//                                .mvcMatchers(
-//                                        HttpMethod.POST,
-//                                        "/api/users/join",
-//                                        "/api/users/login",
-//                                        "/ws-stomp/**",
-//                                        "/ws-stomp",
-//                                        "/ws-stomp/chat"
-//                                ).permitAll()
-                                .anyRequest().permitAll()
+                                .mvcMatchers(
+                                        HttpMethod.GET,
+                                        "/api/v1/users").permitAll()
+                                .mvcMatchers(
+                                        HttpMethod.POST,
+                                        "/api/v1/users"
+                                ).permitAll()
+                                .anyRequest().authenticated()
                 )
                 .apply(new JwtSecurityConfig(jwtTokenProvider))
                 .and()

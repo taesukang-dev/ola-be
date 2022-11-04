@@ -3,6 +3,7 @@ package com.example.ola.dto.security;
 import com.example.ola.domain.User;
 import com.example.ola.domain.UserRole;
 import com.example.ola.dto.UserDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+@Slf4j
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -47,9 +49,9 @@ public class UserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {return this.authorities; }
 
-    @Override public String getPassword() { return null; }
+    @Override public String getPassword() { return this.password; }
 
-    @Override public String getUsername() { return null; }
+    @Override public String getUsername() { return this.username; }
 
     @Override public boolean isAccountNonExpired() { return true; }
 

@@ -24,7 +24,7 @@ public class User {
     private String name;
     private Long ageRange;
     private String homeGym;
-    private UserRole role = UserRole.USER;
+    @Enumerated(EnumType.STRING) private UserRole role = UserRole.USER;
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
