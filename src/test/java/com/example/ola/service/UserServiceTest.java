@@ -30,10 +30,10 @@ class UserServiceTest {
     @Test
     void 회원가입() throws Exception {
         // given
-        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20, "없음");
+        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음");
         when(userRepository.findByUsername("user1")).thenReturn(Optional.empty());
         when(userRepository.save(any()))
-                .thenReturn(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20, "없음"));
+                .thenReturn(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음"));
         // when
         UserDto join = userService.join(userRequest);
         // then
@@ -48,8 +48,8 @@ class UserServiceTest {
 
     @Test
     void 회원가입시_중복일_경우() throws Exception {
-        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20, "없음");
-        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20, "없음")));
+        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음");
+        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음")));
         assertThatThrownBy(() -> userService.join(userRequest))
                 .isInstanceOf(OlaApplicationException.class);
     }
@@ -57,7 +57,7 @@ class UserServiceTest {
     @Test
     void 회원조회() throws Exception {
         // given when
-        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20, "없음")));
+        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음")));
         UserDto user1 = userService.findByUserName("user1");
         // then
         assertThat(user1.getUsername()).isEqualTo("user1");

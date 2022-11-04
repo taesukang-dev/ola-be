@@ -18,3 +18,7 @@ spring:
       hibernate.show_sql: true
       hibernate.default_batch_fetch_size: 100
   sql.init.mode: always
+jwt:
+  secret: b2xhLWp3dHNlY3JldGtleXNldHRpbmdzLWl0Z29lc3Rvand0dG9rZW5wcm92aWRlci1pdHdvdWxkYmVsb25nZXItc29pc2F5bWVhbmluZ2xlc3N0aGluZ3M=
+  token-validity-in-seconds: 300000000
+  refresh-token-validity-in-seconds: 2592000000

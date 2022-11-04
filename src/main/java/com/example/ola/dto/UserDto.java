@@ -11,14 +11,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserDto {
+    private Long id;
     private String username;
     private String password;
     private String nickname;
     private String name;
-    private int ageRange;
+    private Long ageRange;
     private String homeGym;
 
     public static UserDto fromUser(User user) {
-        return new UserDto(user.getUsername(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym());
+        return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym());
     }
 }
