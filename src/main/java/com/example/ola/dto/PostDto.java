@@ -15,14 +15,16 @@ import java.sql.Timestamp;
 @Builder
 public class PostDto {
     private Long id;
-    private User user;
+    private UserDto userDto;
+    private String title;
     private String content;
     private Timestamp registeredAt;
 
     public static PostDto fromPost(Post post) {
         return new PostDto(
                 post.getId(),
-                post.getUser(),
+                UserDto.fromUser(post.getUser()),
+                post.getTitle(),
                 post.getContent(),
                 post.getRegisteredAt()
         );

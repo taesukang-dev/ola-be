@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 @Builder
 public class TeamPostDto {
     private Long id;
-    private User user;
+    private UserDto userDto;
+    private String title;
     private String content;
     private String place;
     private Long limits;
@@ -28,7 +29,8 @@ public class TeamPostDto {
     public static TeamPostDto fromPost(TeamBuildingPost teamBuildingPost) {
         return new TeamPostDto(
                 teamBuildingPost.getId(),
-                teamBuildingPost.getUser(),
+                UserDto.fromUser(teamBuildingPost.getUser()),
+                teamBuildingPost.getTitle(),
                 teamBuildingPost.getContent(),
                 teamBuildingPost.getPlace(),
                 teamBuildingPost.getLimits(),
