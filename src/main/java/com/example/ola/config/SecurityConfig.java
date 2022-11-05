@@ -45,11 +45,11 @@ public class SecurityConfig {
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .mvcMatchers(
                                         HttpMethod.GET,
-                                        "/api/v1/users").permitAll()
-                                .mvcMatchers(
-                                        HttpMethod.POST,
-                                        "/api/v1/users"
-                                ).permitAll()
+                                        "/api/v2/posts/**").permitAll()
+//                                .mvcMatchers(
+//                                        HttpMethod.POST,
+//                                        "/api/v1/users"
+//                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .apply(new JwtSecurityConfig(jwtTokenProvider))
