@@ -1,6 +1,7 @@
 package com.example.ola.controller;
 
 import com.example.ola.dto.UserDto;
+import com.example.ola.dto.request.UserLoginRequest;
 import com.example.ola.dto.request.UserRequest;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,5 +60,47 @@ class UserControllerTest {
                                 .content(objectMapper.writeValueAsBytes(userRequest))
                 ).andDo(print())
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    void 로그인() throws Exception {
+        String username = "username";
+        String password = "password";
+        // given
+        when(userService.login(username, password)).thenReturn("test token");
+        // when then
+        mockMvc.perform(post("/api/v1/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new UserLoginRequest(username, password))))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 로그인시_회원가입이_안된_유저인_경우() throws Exception {
+        String username = "username";
+        String password = "password";
+        // given
+        when(userService.login(username, password)).thenThrow(new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        // when then
+        mockMvc.perform(post("/api/v1/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new UserLoginRequest(username, password))))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void 로그인시_비밀번호가_틀린_경우() throws Exception {
+        String username = "username";
+        String password = "password";
+        // given
+        when(userService.login(username, password)).thenThrow(new OlaApplicationException(ErrorCode.INVALID_PASSWORD));
+        // when then
+        mockMvc.perform(post("/api/v1/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new UserLoginRequest(username, password))))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 }
