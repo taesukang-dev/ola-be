@@ -37,6 +37,12 @@ public class TeamBuildingPost extends Post {
         return new TeamBuildingPost(user, title, content, place, limits);
     }
 
+    public void update(String title, String content, String place) {
+        this.update(title, content);
+        this.place = place;
+    }
+
+
     /**
      * true : 꽉 참
      * false : 자리 남음!

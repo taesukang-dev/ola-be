@@ -26,7 +26,6 @@ public class Post {
     private User user;
     private String title;
     private String content;
-    // TODO : COMMENT 추가할 것
     // TODO : Image 추가할 것
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
@@ -40,6 +39,11 @@ public class Post {
 
     public static Post of(User user, String title, String content) {
         return new Post(user, title, content);
+    }
+
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
     }
 
     @PrePersist void registeredAt() { this.registeredAt = Timestamp.from(Instant.now()); }
