@@ -37,9 +37,7 @@ public class PostService {
                                 userRepository.findByUsername(postWriteRequest.getUsername())
                                         .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
                                 postWriteRequest.getTitle(),
-                                postWriteRequest.getContent()
-                        ))
-        );
+                                postWriteRequest.getContent())));
     }
 
     @Transactional
@@ -55,10 +53,7 @@ public class PostService {
                                 teamPostWriteRequest.getTitle(),
                                 teamPostWriteRequest.getContent(),
                                 teamPostWriteRequest.getPlace(),
-                                teamPostWriteRequest.getLimits()
-                        )
-                )
-        );
+                                teamPostWriteRequest.getLimits())));
     }
 
     @Transactional
@@ -89,8 +84,7 @@ public class PostService {
     }
 
     public TeamPostDto findTeamPostById(Long postId) {
-        return TeamPostDto.fromPost(
-                postRepository.findTeamPostById(postId)
+        return TeamPostDto.fromPost(postRepository.findTeamPostById(postId)
                         .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
     }
 
