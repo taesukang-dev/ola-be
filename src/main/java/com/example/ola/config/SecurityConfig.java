@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .mvcMatchers(
                                         HttpMethod.GET,
-                                        "/api/v2/posts/**").permitAll()
+                                        "/api/v2/posts/**"
+                                ).permitAll()
                                 .mvcMatchers(
                                         HttpMethod.POST,
                                         "/api/v1/users/**"
