@@ -14,6 +14,7 @@ public enum ErrorCode {
     UNAUTHORIZED_BEHAVIOR(HttpStatus.UNAUTHORIZED, "Unauthorized behavior"),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not found"),
+    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "Alarm not found"),
     ;
 
     private HttpStatus status;

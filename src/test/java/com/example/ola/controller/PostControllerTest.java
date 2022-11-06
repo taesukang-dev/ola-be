@@ -438,4 +438,44 @@ class PostControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 알림_조회() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(get("/api/v1/posts/alarms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 알림_삭제() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(delete("/api/v1/posts/alarms/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 알림_삭제시_알림이_없는경우() throws Exception {
+        // given
+        doThrow(new OlaApplicationException(ErrorCode.ALARM_NOT_FOUND))
+                .when(postService).deleteAlarm(any());
+        // when
+        // then
+        mockMvc.perform(delete("/api/v1/posts/alarms/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+
+
 }

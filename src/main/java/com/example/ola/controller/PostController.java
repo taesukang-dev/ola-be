@@ -4,10 +4,7 @@ import com.example.ola.dto.request.PostUpdateRequest;
 import com.example.ola.dto.request.PostWriteRequest;
 import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
-import com.example.ola.dto.response.CommentResponse;
-import com.example.ola.dto.response.PostResponse;
-import com.example.ola.dto.response.Response;
-import com.example.ola.dto.response.TeamPostResponse;
+import com.example.ola.dto.response.*;
 import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -103,6 +100,19 @@ public class PostController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         postService.delete(postId, userPrincipal.getUsername(), commentId);
+        return Response.success();
+    }
+
+    @GetMapping("/alarms")
+    public Response<List<AlarmResponse>> alarmList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return Response.success(postService.alarms(userPrincipal.getUsername())
+                .stream().map(AlarmResponse::fromAlarmDto)
+                .collect(Collectors.toList()));
+    }
+
+    @DeleteMapping("/alarms/{alarmId}")
+    public Response<Void> deleteAlarm(@PathVariable Long alarmId) {
+        postService.deleteAlarm(alarmId);
         return Response.success();
     }
 }

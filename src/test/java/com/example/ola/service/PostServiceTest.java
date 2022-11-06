@@ -20,7 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
+@Transactional
 @SpringBootTest
 class PostServiceTest {
     @Autowired PostService postService;
@@ -369,12 +372,14 @@ class PostServiceTest {
         assertThat(commentDtos.get(9).getContent()).isEqualTo("content9");
     }
 
+
     @Test
     void 댓글_작성() throws Exception {
         // given
-        when(userRepository.findByUsername(any())).thenReturn(Optional.of(mock(User.class)));
-        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeFixture()));
-        when(commentRepository.findById(any())).thenReturn(Optional.of(mock(Comment.class)));
+        Post post = Fixture.makeFixture();
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(post.getUser()));
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(Fixture.commentFixture(post)));
         doNothing().when(commentRepository).save(any());
         // when
         postService.writeComment(1L, "name", "content");
