@@ -1,8 +1,7 @@
 package com.example.ola.service;
 
-import com.example.ola.domain.Comment;
-import com.example.ola.domain.Post;
-import com.example.ola.domain.TeamBuildingPost;
+import com.example.ola.domain.*;
+import com.example.ola.dto.AlarmDto;
 import com.example.ola.dto.CommentDto;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.TeamPostDto;
@@ -12,6 +11,7 @@ import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
+import com.example.ola.repository.AlarmRepository;
 import com.example.ola.repository.CommentRepository;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final AlarmRepository alarmRepository;
 
     @Transactional
     public PostDto write(PostWriteRequest postWriteRequest, String userPrincipalUsername) {
@@ -141,29 +143,30 @@ public class PostService {
 
     @Transactional
     public void writeComment(Long postId, String userPrincipalUsername, String content) {
-        commentRepository.save(
-                Comment.of(
-                        userRepository.findByUsername(userPrincipalUsername)
-                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
-                        postRepository.findById(postId)
-                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)),
-                        content
-                ));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        User user = userRepository.findByUsername(userPrincipalUsername)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        commentRepository.save(Comment.of(user, post, content));
+        alarmRepository.save(Alarm.of(
+                post.getUser(),
+                AlarmArgs.of(postId, userPrincipalUsername),
+                AlarmType.COMMENT));
     }
 
     @Transactional
     public void writeComment(Long postId, Long parentId, String userPrincipalUsername, String content) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND));
-        parent.addChild(
-                Comment.of(
-                        userRepository.findByUsername(userPrincipalUsername)
-                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
-                        postRepository.findById(postId)
-                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)),
-                        content
-                )
-        );
+        User user = userRepository.findByUsername(userPrincipalUsername)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        parent.addChild(Comment.of(user, post, content));
+        alarmRepository.save(Alarm.of(
+                parent.getUser(),
+                AlarmArgs.of(post.getId(), userPrincipalUsername),
+                AlarmType.COMMENT));
     }
 
     @Transactional
@@ -181,4 +184,17 @@ public class PostService {
         commentRepository.delete(comment);
     }
 
+    @Transactional
+    public List<AlarmDto> alarms(String username) {
+        return alarmRepository.findByUsername(username)
+                .map(alarms -> alarms.stream().map(AlarmDto::fromAlarm)
+                        .collect(Collectors.toList())).orElseGet(List::of);
+    }
+
+    @Transactional
+    public void deleteAlarm(Long alarmId) {
+        Alarm alarm = alarmRepository.findById(alarmId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.ALARM_NOT_FOUND));
+        alarmRepository.remove(alarm);
+    }
 }
