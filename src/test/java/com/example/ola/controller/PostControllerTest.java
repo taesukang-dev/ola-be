@@ -8,7 +8,7 @@ import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
-import com.example.ola.fixture.PostFixture;
+import com.example.ola.fixture.Fixture;
 import com.example.ola.fixture.TeamPostFixture;
 import com.example.ola.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +23,6 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
@@ -66,7 +65,7 @@ class PostControllerTest {
     @Test
     void 일반_게시글_단건_조회() throws Exception {
         // given
-        when(postService.findById(any())).thenReturn(PostDto.fromPost(PostFixture.makeFixture()));
+        when(postService.findById(any())).thenReturn(PostDto.fromPost(Fixture.makeFixture()));
         // when then
         mockMvc.perform(get("/api/v2/posts/1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -128,7 +127,7 @@ class PostControllerTest {
                 .title("title")
                 .content("content")
                 .build();
-        when(postService.updatePost(any(), any())).thenReturn(PostDto.fromPost(PostFixture.makeFixture()));
+        when(postService.updatePost(any(), any())).thenReturn(PostDto.fromPost(Fixture.makeFixture()));
         // when then
         mockMvc.perform(put("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -213,7 +212,7 @@ class PostControllerTest {
                 .limits(3L)
                 .build();
         // when then
-        mockMvc.perform(post("/api/v1/posts/team")
+        mockMvc.perform(post("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -308,4 +307,135 @@ class PostControllerTest {
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 댓글_조회() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(get("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithAnonymousUser
+    @Test
+    void 댓글_조회시_로그인하지_않은_경우() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(get("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 댓글_작성() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes("content"))
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 대댓글_작성() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes("content"))
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithAnonymousUser
+    @Test
+    void 댓글_작성시_로그인하지_않은_경우() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes("content"))
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 댓글_작성시_게시글이_없는_경우() throws Exception {
+        // given
+        doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+                .when(postService).writeComment(any(), any(),any());
+        // when then
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes("content"))
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 대댓글_작성시_부모_댓글이_없는경우() throws Exception {
+        // given
+        doThrow(new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND))
+                .when(postService).writeComment(any(), any(),any(), any());
+        // when
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes("content"))
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+    }
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 댓글_삭제() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(delete("/api/v1/posts/1/2/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 댓글_삭제시_게시글이_없는_경우() throws Exception {
+        // given
+        doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+                .when(postService).delete(any(), any(),any());
+        // when then
+        mockMvc.perform(delete("/api/v1/posts/1/2/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    void 댓글_삭제시_유저가_다른_경우() throws Exception {
+        // given
+        doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
+                .when(postService).delete(any(), any(),any());
+        // when then
+        mockMvc.perform(delete("/api/v1/posts/1/2/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
 }

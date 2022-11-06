@@ -1,7 +1,9 @@
 package com.example.ola.service;
 
+import com.example.ola.domain.Comment;
 import com.example.ola.domain.Post;
 import com.example.ola.domain.TeamBuildingPost;
+import com.example.ola.dto.CommentDto;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.TeamPostDto;
 import com.example.ola.dto.request.PostUpdateRequest;
@@ -10,6 +12,7 @@ import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
+import com.example.ola.repository.CommentRepository;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public PostDto write(PostWriteRequest postWriteRequest, String userPrincipalUsername) {
@@ -85,7 +89,7 @@ public class PostService {
 
     public TeamPostDto findTeamPostById(Long postId) {
         return TeamPostDto.fromPost(postRepository.findTeamPostById(postId)
-                        .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
     }
 
     public List<PostDto> findAllPostsWithPaging(int start) {
@@ -120,6 +124,61 @@ public class PostService {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
         postRepository.remove(post);
+    }
+
+    // TODO : post가 teambuildingpost여도 문제없이 find 되는지 체크할 것
+    // TODO : 도메인에는 downcasting하는 생성자 만들어놨음
+    // 예상은 comment에 들어가는 post가 teambuildingpost는 아니지만 find 될듯
+    public List<CommentDto> commentList(Long postId) {
+        return commentRepository.findByPostId(
+                        postRepository.findById(postId)
+                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+                                .getId())
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+                .stream().map(CommentDto::fromComment)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void writeComment(Long postId, String userPrincipalUsername, String content) {
+        commentRepository.save(
+                Comment.of(
+                        userRepository.findByUsername(userPrincipalUsername)
+                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
+                        postRepository.findById(postId)
+                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)),
+                        content
+                ));
+    }
+
+    @Transactional
+    public void writeComment(Long postId, Long parentId, String userPrincipalUsername, String content) {
+        Comment parent = commentRepository.findById(parentId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND));
+        parent.addChild(
+                Comment.of(
+                        userRepository.findByUsername(userPrincipalUsername)
+                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
+                        postRepository.findById(postId)
+                                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)),
+                        content
+                )
+        );
+    }
+
+    @Transactional
+    public void delete(Long postId, String userPrincipalUsername, Long commentId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND));
+        if (!comment.getUser().getUsername().equals(userPrincipalUsername)) {
+            throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
+        }
+        if (comment.getPost() != post) {
+            throw new OlaApplicationException(ErrorCode.POST_NOT_FOUND);
+        }
+        commentRepository.delete(comment);
     }
 
 }

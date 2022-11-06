@@ -1,8 +1,10 @@
 package com.example.ola.service;
 
+import com.example.ola.domain.Comment;
 import com.example.ola.domain.Post;
 import com.example.ola.domain.TeamBuildingPost;
 import com.example.ola.domain.User;
+import com.example.ola.dto.CommentDto;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.TeamPostDto;
 import com.example.ola.dto.request.PostUpdateRequest;
@@ -10,6 +12,8 @@ import com.example.ola.dto.request.PostWriteRequest;
 import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.exception.OlaApplicationException;
+import com.example.ola.fixture.Fixture;
+import com.example.ola.repository.CommentRepository;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -24,13 +28,14 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class PostServiceTest {
     @Autowired PostService postService;
     @MockBean PostRepository postRepository;
     @MockBean UserRepository userRepository;
+    @MockBean CommentRepository commentRepository;
 
     @Test
     void 일반게시물_작성() throws Exception {
@@ -339,6 +344,111 @@ class PostServiceTest {
         // when
         // then
         assertThatThrownBy(() -> postService.removeTeamPost(1L, "asd"))
+                .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
+    void 댓글_조회() throws Exception {
+        // given
+        List<Comment> temp = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Post post = Fixture.makeFixture();
+            Comment comment = Comment.of(
+                    post.getUser(),
+                    post,
+                    "content" + i
+            );
+            temp.add(comment);
+        }
+        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeFixture()));
+        when(commentRepository.findByPostId(any())).thenReturn(Optional.of(temp));
+        // when
+        List<CommentDto> commentDtos = postService.commentList(1L);
+        // then
+        assertThat(commentDtos.size()).isEqualTo(10);
+        assertThat(commentDtos.get(9).getContent()).isEqualTo("content9");
+    }
+
+    @Test
+    void 댓글_작성() throws Exception {
+        // given
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(mock(User.class)));
+        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeFixture()));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(mock(Comment.class)));
+        doNothing().when(commentRepository).save(any());
+        // when
+        postService.writeComment(1L, "name", "content");
+        postService.writeComment(1L, 1L, "name", "content");
+        // then
+        assertThatNoException();
+    }
+
+    @Test
+    void 댓글_작성시_유저가_없는_경우() throws Exception {
+        // given
+        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeFixture()));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(mock(Comment.class)));
+        // when then
+        assertThatThrownBy(() -> postService.writeComment(1L, "name", "content"))
+                .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
+    void 댓글_작성시_게시글이_없는_경우() throws Exception {
+        // given
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(mock(User.class)));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(mock(Comment.class)));
+        // when then
+        assertThatThrownBy(() -> postService.writeComment(1L, "name", "content"))
+                .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
+    void 대댓글_작성시_부모_댓글이_없는_경우() throws Exception {
+        // given
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(mock(User.class)));
+        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeFixture()));
+        // when then
+        assertThatThrownBy(() -> postService.writeComment(1L, null, "name", "content"))
+                .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
+    void 댓글_삭제() throws Exception {
+        // given
+        Post post = Fixture.makeFixture();
+        Comment comment = Fixture.commentFixture(post);
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+        doNothing().when(commentRepository).delete(any());
+        // when
+        postService.delete(1L, "user1", 1L);
+        // then
+        assertThatNoException();
+    }
+
+    @Test
+    void 댓글_삭제시_댓글을_적은_유저와_삭제시도_유저가_다른경우() throws Exception {
+        // given
+        Post post = Fixture.makeFixture();
+        Comment comment = Fixture.commentFixture(post);
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+        // when then
+        assertThatThrownBy(() -> postService.delete(1L, "none", 1L))
+                .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
+    void 댓글_삭제시_게시글이_다른경우() throws Exception {
+        // given
+        Post post = Fixture.makeFixture();
+        Post post2 = Fixture.makeFixture();
+        Comment comment = Fixture.commentFixture(post2);
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
+        // when then
+        assertThatThrownBy(() -> postService.delete(1L, "none", 1L))
                 .isInstanceOf(OlaApplicationException.class);
     }
 }
