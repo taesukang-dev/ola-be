@@ -1,7 +1,6 @@
 package com.example.ola.domain;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 
 import lombok.Data;
 import lombok.Builder;
