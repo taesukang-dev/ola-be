@@ -14,17 +14,18 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserJoinResponse {
     private Long id;
-    private String username;
+    private String userId;
     private String nickname;
     private String name;
     private Long ageRange;
     private String homeGym;
+    private String userGender;
 
     public static UserJoinResponse fromUserDto(UserDto userDto) {
-        return new UserJoinResponse(userDto.getId(), userDto.getUsername(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGym());
+        return new UserJoinResponse(userDto.getId(), userDto.getUsername(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGym(), userDto.getGender());
     }
 
     public static UserJoinResponse fromUserPrincipal(UserPrincipal userPrincipal) {
-        return new UserJoinResponse(userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getNickname(), userPrincipal.getName(), userPrincipal.getAgeRange(), userPrincipal.getHomeGym());
+        return new UserJoinResponse(userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getNickname(), userPrincipal.getName(), userPrincipal.getAgeRange(), userPrincipal.getHomeGym(), userPrincipal.getUserGender());
     }
 }

@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @Builder
 public class PostResponse {
     private Long id;
-    private UserJoinResponse userDto;
+    private UserJoinResponse user;
     private String title;
     private String content;
     private Timestamp registeredAt;
