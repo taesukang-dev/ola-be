@@ -24,22 +24,28 @@ public class User {
     private String name;
     private Long ageRange;
     private String homeGym;
+    @Enumerated(EnumType.STRING) private UserGender userGender;
     @Enumerated(EnumType.STRING) private UserRole role = UserRole.USER;
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
-    public User(String username, String password, String nickname, String name, Long ageRange, String homeGym) {
+    public User(String username, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.name = name;
         this.ageRange = ageRange;
         this.homeGym = homeGym;
+        if (userGender.equals("male")) {
+            this.userGender = UserGender.M;
+        } else {
+            this.userGender = UserGender.F;
+        }
     }
 
-    public static User of(String username, String password, String nickname, String name, Long ageRange, String homeGym) {
-        return new User(username, password, nickname, name, ageRange, homeGym);
+    public static User of(String username, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
+        return new User(username, password, nickname, name, ageRange, homeGym, userGender);
     }
 
     @PrePersist void registeredAt() { this.registeredAt = Timestamp.from(Instant.now()); }
