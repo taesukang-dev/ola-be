@@ -18,8 +18,9 @@ public class UserDto {
     private String name;
     private Long ageRange;
     private String homeGym;
+    private String gender;
 
     public static UserDto fromUser(User user) {
-        return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym());
+        return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym(), user.getUserGender().getName());
     }
 }

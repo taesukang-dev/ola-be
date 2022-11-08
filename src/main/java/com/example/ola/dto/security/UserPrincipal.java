@@ -30,6 +30,7 @@ public class UserPrincipal implements UserDetails {
     private String name;
     private Long ageRange;
     private String homeGym;
+    private String userGender;
     Collection<? extends GrantedAuthority> authorities;
 
     public static UserPrincipal fromUser(User user) {
@@ -42,6 +43,7 @@ public class UserPrincipal implements UserDetails {
                 user.getName(),
                 user.getAgeRange(),
                 user.getHomeGym(),
+                user.getUserGender().getName(),
                 roles.stream().map(UserRole::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toUnmodifiableSet())
         );
     }
