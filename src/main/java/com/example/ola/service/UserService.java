@@ -1,6 +1,7 @@
 package com.example.ola.service;
 
 import com.example.ola.domain.User;
+import com.example.ola.domain.UserGender;
 import com.example.ola.domain.UserRole;
 import com.example.ola.dto.UserDto;
 import com.example.ola.dto.request.UserRequest;
@@ -40,7 +41,8 @@ public class UserService {
                                 userRequest.getNickname(),
                                 userRequest.getName(),
                                 userRequest.getAgeRange(),
-                                userRequest.getHomeGym())));
+                                userRequest.getHomeGym(),
+                                userRequest.getGender())));
     }
 
     public String login(String username, String password) {

@@ -1,5 +1,6 @@
 package com.example.ola.dto.request;
 
+import com.example.ola.domain.UserGender;
 import lombok.Data;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
@@ -24,5 +25,6 @@ public class UserRequest {
     private String name;
     private Long ageRange;
     private String homeGym;
+    private String gender;
 }
 
