@@ -12,7 +12,7 @@ spring:
   jpa:
     open-in-view: false
     defer-datasource-initialization: true
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: create
     properties:
       hibernate.format_sql: true
       hibernate.show_sql: true

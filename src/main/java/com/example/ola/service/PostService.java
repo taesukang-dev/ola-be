@@ -51,15 +51,15 @@ public class PostService {
         if (!userPrincipalUsername.equals(teamPostWriteRequest.getUsername())) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        return TeamPostDto.fromPost(
-                postRepository.saveTeamPost(
-                        TeamBuildingPost.of(
-                                userRepository.findByUsername(teamPostWriteRequest.getUsername())
-                                        .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
-                                teamPostWriteRequest.getTitle(),
-                                teamPostWriteRequest.getContent(),
-                                teamPostWriteRequest.getPlace(),
-                                teamPostWriteRequest.getLimits())));
+        TeamBuildingPost post = TeamBuildingPost.of(
+                userRepository.findByUsername(teamPostWriteRequest.getUsername())
+                        .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
+                teamPostWriteRequest.getTitle(),
+                teamPostWriteRequest.getContent(),
+                teamPostWriteRequest.getPlace(),
+                teamPostWriteRequest.getLimits());
+        post.getMembers().add(post.getUser());
+        return TeamPostDto.fromPost(postRepository.saveTeamPost(post));
     }
 
     @Transactional
