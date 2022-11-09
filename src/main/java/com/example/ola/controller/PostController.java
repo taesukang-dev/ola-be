@@ -65,6 +65,14 @@ public class PostController {
         return Response.success();
     }
 
+    @PostMapping("/team/{postId}/member")
+    public Response<Void> addMember(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        postService.addMember(postId, userPrincipal.getUsername());
+        return Response.success();
+    }
+
     @GetMapping("/{postId}/comments")
     public Response<List<CommentResponse>> commentList(
             @PathVariable Long postId,

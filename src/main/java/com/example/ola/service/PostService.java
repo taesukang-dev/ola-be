@@ -128,9 +128,6 @@ public class PostService {
         postRepository.remove(post);
     }
 
-    // TODO : post가 teambuildingpost여도 문제없이 find 되는지 체크할 것
-    // TODO : 도메인에는 downcasting하는 생성자 만들어놨음
-    // 예상은 comment에 들어가는 post가 teambuildingpost는 아니지만 find 될듯
     public List<CommentDto> commentList(Long postId) {
         return commentRepository.findByPostId(
                         postRepository.findById(postId)
@@ -196,5 +193,27 @@ public class PostService {
         Alarm alarm = alarmRepository.findById(alarmId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.ALARM_NOT_FOUND));
         alarmRepository.remove(alarm);
+    }
+
+    @Transactional
+    public void addMember(Long id, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        TeamBuildingPost post = postRepository.findTeamPostById(id)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        if (!post.checkLimits()) {
+            post.getMembers()
+                    .stream()
+                    .filter(e -> e.getUsername().equals(username))
+                    .findAny().ifPresent(it -> {
+                        throw new OlaApplicationException(ErrorCode.DUPLICATED_MEMBER);
+                    });
+            post.getMembers().add(user);
+            if (post.getMembers().size() == post.getLimits()) {
+                post.updateStatus(TeamBuildingStatus.CONFIRMED);
+            }
+        } else {
+            throw new OlaApplicationException(ErrorCode.BAD_REQUEST);
+        }
     }
 }
