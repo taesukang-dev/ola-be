@@ -2,6 +2,7 @@ package com.example.ola.dto;
 
 import com.example.ola.domain.Post;
 import com.example.ola.domain.TeamBuildingPost;
+import com.example.ola.domain.TeamBuildingStatus;
 import com.example.ola.domain.User;
 import lombok.Data;
 import lombok.Builder;
@@ -25,6 +26,7 @@ public class TeamPostDto {
     private Long limits;
     private List<UserDto> member;
     private Timestamp registeredAt;
+    private TeamBuildingStatus status;
 
     public static TeamPostDto fromPost(TeamBuildingPost teamBuildingPost) {
         return new TeamPostDto(
@@ -37,7 +39,8 @@ public class TeamPostDto {
                 teamBuildingPost.getMembers()
                         .stream().map(UserDto::fromUser)
                         .collect(Collectors.toList()),
-                teamBuildingPost.getRegisteredAt()
+                teamBuildingPost.getRegisteredAt(),
+                teamBuildingPost.getTeamBuildingStatus()
         );
     }
 }
