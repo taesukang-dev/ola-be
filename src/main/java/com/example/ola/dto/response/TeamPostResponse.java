@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Builder
 public class TeamPostResponse {
     private Long id;
-    private UserJoinResponse userJoinResponse;
+    private UserJoinResponse user;
     private String title;
     private String content;
     private String place;

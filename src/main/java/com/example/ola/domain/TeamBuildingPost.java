@@ -17,9 +17,10 @@ import java.util.List;
 public class TeamBuildingPost extends Post {
     private String place;
     private Long limits;
-    @OneToMany
+    @ManyToMany
     private List<User> members = new ArrayList<>();
-    @Enumerated
+
+    @Enumerated(EnumType.STRING)
     TeamBuildingStatus teamBuildingStatus = TeamBuildingStatus.READY;
 
     public TeamBuildingPost(String place, Long limits) {

@@ -21,19 +21,18 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public Response<Void> write(
+    public Response<PostResponse> write(
             @RequestBody PostWriteRequest postWriteRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.write(postWriteRequest, userPrincipal.getUsername());
-        return Response.success();
+
+        return Response.success(PostResponse.fromPostDto(postService.write(postWriteRequest, userPrincipal.getUsername())));
     }
 
     @PostMapping("/team")
-    public Response<Void> writeTeamPost(
+    public Response<TeamPostResponse> writeTeamPost(
             @RequestBody TeamPostWriteRequest teamPostWriteRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.writeTeamPost(teamPostWriteRequest, userPrincipal.getUsername());
-        return Response.success();
+        return Response.success(TeamPostResponse.fromTeamPostDto(postService.writeTeamPost(teamPostWriteRequest, userPrincipal.getUsername())));
     }
 
     @PutMapping
