@@ -1,6 +1,7 @@
 package com.example.ola.dto;
 
 import com.example.ola.domain.Alarm;
+import com.example.ola.domain.AlarmType;
 import lombok.Data;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
@@ -15,9 +16,10 @@ public class AlarmDto {
     private String receivedUsername;
     private String fromUsername;
     private Long postId;
+    private AlarmType alarmType;
 
-    public static AlarmDto of(Long id, String receivedUsername, String fromUsername, Long postId) {
-        return new AlarmDto(id, receivedUsername, fromUsername, postId);
+    public static AlarmDto of(Long id, String receivedUsername, String fromUsername, Long postId, AlarmType alarmType) {
+        return new AlarmDto(id, receivedUsername, fromUsername, postId, alarmType);
     }
 
     public static AlarmDto fromAlarm(Alarm alarm) {
@@ -25,7 +27,8 @@ public class AlarmDto {
                 alarm.getId(),
                 alarm.getUser().getUsername(),
                 alarm.getArgs().getFromUser(),
-                alarm.getArgs().getPostId()
+                alarm.getArgs().getPostId(),
+                alarm.getAlarmType()
         );
     }
 }
