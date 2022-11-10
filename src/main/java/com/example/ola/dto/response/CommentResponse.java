@@ -18,18 +18,20 @@ import java.util.stream.Collectors;
 public class CommentResponse {
     private Long id;
     private String username;
+    private String nickname;
     private Long postId;
     private String content;
     private List<CommentResponse> child;
 
-    public static CommentResponse of(Long id, String username, Long postId, String content, List<CommentResponse> child) {
-        return new CommentResponse(id, username, postId, content, child);
+    public static CommentResponse of(Long id, String username, String nickname, Long postId, String content, List<CommentResponse> child) {
+        return new CommentResponse(id, username, nickname, postId, content, child);
     }
 
     public static CommentResponse fromCommentDto(CommentDto commentDto) {
         return new CommentResponse(
                 commentDto.getId(),
                 commentDto.getUser().getUsername(),
+                commentDto.getUser().getNickname(),
                 commentDto.getPost().getId(),
                 commentDto.getContent(),
                 commentDto.getChild()
