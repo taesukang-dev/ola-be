@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CommentWriteRequest {
     private String content;
+    private CommentWriteRequestType type;
     private Long postId;
 }
