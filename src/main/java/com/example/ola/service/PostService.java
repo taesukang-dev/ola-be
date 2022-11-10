@@ -159,7 +159,7 @@ public class PostService {
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
-        parent.addChild(Comment.of(user, post, content));
+        parent.addChild(Comment.of(user, post, content, parent));
         alarmRepository.save(Alarm.of(
                 parent.getUser(),
                 AlarmArgs.of(post.getId(), userPrincipalUsername),
