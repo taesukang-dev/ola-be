@@ -1,19 +1,18 @@
 package com.example.ola.controller;
 
-import com.example.ola.dto.request.PostUpdateRequest;
-import com.example.ola.dto.request.PostWriteRequest;
-import com.example.ola.dto.request.TeamPostUpdateRequest;
-import com.example.ola.dto.request.TeamPostWriteRequest;
+import com.example.ola.dto.request.*;
 import com.example.ola.dto.response.*;
 import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
 @RestController
@@ -84,20 +83,20 @@ public class PostController {
 
     @PostMapping("/{postId}/comments")
     public Response<Void> writeComment(
-            @RequestBody String content,
+            @RequestBody CommentWriteRequest commentWriteRequest,
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.writeComment(postId, userPrincipal.getUsername(), content);
+        postService.writeComment(postId, userPrincipal.getUsername(), commentWriteRequest.getContent());
         return Response.success();
     }
 
     @PostMapping("/{postId}/{parentId}/comments")
     public Response<Void> writeCommentWithParent(
-            @RequestBody String content,
+            @RequestBody CommentWriteRequest commentWriteRequest,
             @PathVariable Long postId,
             @PathVariable Long parentId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.writeComment(postId, parentId, userPrincipal.getUsername(), content);
+        postService.writeComment(postId, parentId, userPrincipal.getUsername(), commentWriteRequest.getContent());
         return Response.success();
     }
 
