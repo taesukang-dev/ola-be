@@ -49,7 +49,9 @@ public class PostRepository {
     public Optional<List<Post>> findAllPostsWithPaging(int start) {
         return Optional.ofNullable(em.createQuery("select p from Post p" +
                         " join fetch p.user" +
+                        " where dtype =:post" +
                         " order by p.id desc", Post.class)
+                        .setParameter("post", "post")
                 .setFirstResult(start * 10)
                 .setMaxResults(10)
                 .getResultList());
@@ -60,7 +62,7 @@ public class PostRepository {
                         " join fetch p.user" +
                         " order by p.id desc", TeamBuildingPost.class)
                 .setFirstResult(start * 10)
-                .setMaxResults(10)
+                .setMaxResults(9)
                 .getResultList());
     }
 
