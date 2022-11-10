@@ -1,5 +1,6 @@
 package com.example.ola.dto.response;
 
+import com.example.ola.domain.AlarmType;
 import com.example.ola.dto.AlarmDto;
 import lombok.Data;
 import lombok.Builder;
@@ -15,13 +16,15 @@ public class AlarmResponse {
     private String receivedUsername;
     private String fromUsername;
     private Long postId;
+    private AlarmType alarmType;
 
     public static AlarmResponse fromAlarmDto(AlarmDto alarmDto) {
         return new AlarmResponse(
                 alarmDto.getId(),
                 alarmDto.getReceivedUsername(),
                 alarmDto.getFromUsername(),
-                alarmDto.getId()
+                alarmDto.getPostId(),
+                alarmDto.getAlarmType()
         );
     }
 }
