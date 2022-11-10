@@ -34,10 +34,7 @@ public class Comment {
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
-
-    public void addChild(Comment comment) {
-        this.child.add(comment);
-    }
+    public void addChild(Comment comment) { this.child.add(comment); }
 
     public Comment(User user, Post post, String content) {
         this.user = user;
@@ -45,22 +42,9 @@ public class Comment {
         this.content = content;
     }
 
-    public Comment(User user, TeamBuildingPost post, String content) {
-        this.user = user;
-        this.post = (TeamBuildingPost)post;
-        this.content = content;
-    }
-
     public Comment(User user, Post post, String content, Comment parent) {
         this.user = user;
         this.post = post;
-        this.content = content;
-        this.parent = parent;
-    }
-
-    public Comment(User user, TeamBuildingPost post, String content, Comment parent) {
-        this.user = user;
-        this.post = (TeamBuildingPost)post;
         this.content = content;
         this.parent = parent;
     }
