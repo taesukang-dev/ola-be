@@ -5,10 +5,7 @@ import com.example.ola.dto.AlarmDto;
 import com.example.ola.dto.CommentDto;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.TeamPostDto;
-import com.example.ola.dto.request.PostUpdateRequest;
-import com.example.ola.dto.request.PostWriteRequest;
-import com.example.ola.dto.request.TeamPostUpdateRequest;
-import com.example.ola.dto.request.TeamPostWriteRequest;
+import com.example.ola.dto.request.*;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.repository.AlarmRepository;
@@ -139,20 +136,27 @@ public class PostService {
     }
 
     @Transactional
-    public void writeComment(Long postId, String userPrincipalUsername, String content) {
+    public void writeComment(Long postId, String userPrincipalUsername, String content, CommentWriteRequestType type) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
         User user = userRepository.findByUsername(userPrincipalUsername)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
         commentRepository.save(Comment.of(user, post, content));
-        alarmRepository.save(Alarm.of(
-                post.getUser(),
-                AlarmArgs.of(postId, userPrincipalUsername),
-                AlarmType.COMMENT));
+        if (type.getName().equals("post")) {
+            alarmRepository.save(Alarm.of(
+                    post.getUser(),
+                    AlarmArgs.of(postId, userPrincipalUsername),
+                    AlarmType.COMMENT));
+        } else {
+            alarmRepository.save(Alarm.of(
+                    post.getUser(),
+                    AlarmArgs.of(postId, userPrincipalUsername),
+                    AlarmType.TEAM_COMMENT));
+        }
     }
 
     @Transactional
-    public void writeComment(Long postId, Long parentId, String userPrincipalUsername, String content) {
+    public void writeComment(Long postId, Long parentId, String userPrincipalUsername, String content, CommentWriteRequestType type) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND));
         User user = userRepository.findByUsername(userPrincipalUsername)
@@ -160,10 +164,17 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
         parent.addChild(Comment.of(user, post, content, parent));
-        alarmRepository.save(Alarm.of(
-                parent.getUser(),
-                AlarmArgs.of(post.getId(), userPrincipalUsername),
-                AlarmType.COMMENT));
+        if (type.getName().equals("post")) {
+            alarmRepository.save(Alarm.of(
+                    parent.getUser(),
+                    AlarmArgs.of(postId, userPrincipalUsername),
+                    AlarmType.COMMENT));
+        } else {
+            alarmRepository.save(Alarm.of(
+                    parent.getUser(),
+                    AlarmArgs.of(postId, userPrincipalUsername),
+                    AlarmType.TEAM_COMMENT));
+        }
     }
 
     @Transactional

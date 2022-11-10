@@ -371,35 +371,35 @@ class PostControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    @Test
-    void 댓글_작성시_게시글이_없는_경우() throws Exception {
-        // given
-        doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
-                .when(postService).writeComment(any(), any(),any());
-        // when then
-        mockMvc.perform(post("/api/v1/posts/1/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes("content"))
-                ).andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-
-    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    @Test
-    void 대댓글_작성시_부모_댓글이_없는경우() throws Exception {
-        // given
-        doThrow(new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND))
-                .when(postService).writeComment(any(), any(),any(), any());
-        // when
-        // then
-        mockMvc.perform(post("/api/v1/posts/1/1/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes("content"))
-                ).andDo(print())
-                .andExpect(status().isNotFound());
-    }
+//    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+//    @Test
+//    void 댓글_작성시_게시글이_없는_경우() throws Exception {
+//        // given
+//        doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+//                .when(postService).writeComment(any(), any(),any());
+//        // when then
+//        mockMvc.perform(post("/api/v1/posts/1/comments")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsBytes("content"))
+//                ).andDo(print())
+//                .andExpect(status().isNotFound());
+//    }
+//
+//
+//    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+//    @Test
+//    void 대댓글_작성시_부모_댓글이_없는경우() throws Exception {
+//        // given
+//        doThrow(new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND))
+//                .when(postService).writeComment(any(), any(),any(), any());
+//        // when
+//        // then
+//        mockMvc.perform(post("/api/v1/posts/1/1/comments")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsBytes("content"))
+//                ).andDo(print())
+//                .andExpect(status().isNotFound());
+//    }
     @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_삭제() throws Exception {

@@ -86,7 +86,7 @@ public class PostController {
             @RequestBody CommentWriteRequest commentWriteRequest,
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.writeComment(postId, userPrincipal.getUsername(), commentWriteRequest.getContent());
+        postService.writeComment(postId, userPrincipal.getUsername(), commentWriteRequest.getContent(), commentWriteRequest.getType());
         return Response.success();
     }
 
@@ -96,7 +96,7 @@ public class PostController {
             @PathVariable Long postId,
             @PathVariable Long parentId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.writeComment(postId, parentId, userPrincipal.getUsername(), commentWriteRequest.getContent());
+        postService.writeComment(postId, parentId, userPrincipal.getUsername(), commentWriteRequest.getContent(), commentWriteRequest.getType());
         return Response.success();
     }
 

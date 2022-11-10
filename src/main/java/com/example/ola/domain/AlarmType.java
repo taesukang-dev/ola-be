@@ -3,7 +3,8 @@ package com.example.ola.domain;
 import lombok.Getter;
 
 public enum AlarmType {
-    COMMENT("New Comment"), JOIN("New Joined Member"),;
+    TEAM_COMMENT("New Comment"), JOIN("New Joined Member"),
+    COMMENT("New Comment");
 
     @Getter private String name;
 
