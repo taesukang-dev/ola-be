@@ -20,7 +20,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -194,7 +193,7 @@ class PostControllerTest {
     @Test
     void 일반_게시물_삭제시_작성자와_다른_경우() throws Exception {
         doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
-                .when(postService).removePost(any(), any());
+                .when(postService).delete(any(), any());
         mockMvc.perform(delete("/api/v1/posts/1"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
@@ -417,7 +416,7 @@ class PostControllerTest {
     void 댓글_삭제시_게시글이_없는_경우() throws Exception {
         // given
         doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
-                .when(postService).delete(any(), any(),any());
+                .when(postService).deleteComment(any(), any(),any());
         // when then
         mockMvc.perform(delete("/api/v1/posts/1/2/comments")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -430,7 +429,7 @@ class PostControllerTest {
     void 댓글_삭제시_유저가_다른_경우() throws Exception {
         // given
         doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
-                .when(postService).delete(any(), any(),any());
+                .when(postService).deleteComment(any(), any(),any());
         // when then
         mockMvc.perform(delete("/api/v1/posts/1/2/comments")
                         .contentType(MediaType.APPLICATION_JSON)

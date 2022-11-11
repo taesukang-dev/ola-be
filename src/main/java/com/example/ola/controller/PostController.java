@@ -52,7 +52,7 @@ public class PostController {
     public Response<Void> removePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.removePost(postId, userPrincipal.getUsername());
+        postService.delete(postId, userPrincipal.getUsername());
         return Response.success();
     }
 
@@ -69,6 +69,16 @@ public class PostController {
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         postService.addMember(postId, userPrincipal.getUsername());
+        return Response.success();
+    }
+
+    @DeleteMapping("/team/{postId}/member/{memberId}")
+    public Response<Void> deleteMember(
+            @PathVariable Long postId,
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        postService.removeTeamMember(postId, memberId, userPrincipal.getUsername());
         return Response.success();
     }
 
@@ -105,7 +115,7 @@ public class PostController {
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        postService.delete(postId, userPrincipal.getUsername(), commentId);
+        postService.deleteComment(postId, userPrincipal.getUsername(), commentId);
         return Response.success();
     }
 
