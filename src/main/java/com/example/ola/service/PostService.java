@@ -114,6 +114,7 @@ public class PostService {
         }
         postRepository.remove(post);
         commentRepository.deleteByPostId(postId);
+        alarmRepository.deleteByPostId(postId);
     }
 
     @Transactional
@@ -143,19 +144,7 @@ public class PostService {
         User user = userRepository.findByUsername(userPrincipalUsername)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
         commentRepository.save(Comment.of(user, post, content));
-        Alarm alarm;
-        if (type.getName().equals("post")) {
-            alarm = alarmRepository.save(Alarm.of(
-                    post.getUser(),
-                    AlarmArgs.of(postId, userPrincipalUsername),
-                    AlarmType.COMMENT));
-        } else {
-            alarm = alarmRepository.save(Alarm.of(
-                    post.getUser(),
-                    AlarmArgs.of(postId, userPrincipalUsername),
-                    AlarmType.TEAM_COMMENT));
-        }
-        alarmService.send(alarm.getId(), post.getUser().getId());
+        selectAlarmTypeAndSend(type, post.getUser(), post, userPrincipalUsername);
     }
 
     @Transactional
@@ -167,19 +156,26 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
         parent.addChild(Comment.of(user, post, content, parent));
+        selectAlarmTypeAndSend(type, parent.getUser(), post, userPrincipalUsername);
+    }
+
+    private void selectAlarmTypeAndSend(CommentWriteRequestType type, User user, Post post, String userPrincipalUsername) {
         Alarm alarm;
+        if (userPrincipalUsername.equals(user.getUsername())) {
+            return ;
+        }
         if (type.getName().equals("post")) {
             alarm = alarmRepository.save(Alarm.of(
-                    parent.getUser(),
-                    AlarmArgs.of(postId, userPrincipalUsername),
+                    user,
+                    AlarmArgs.of(post.getId(), userPrincipalUsername),
                     AlarmType.COMMENT));
         } else {
             alarm = alarmRepository.save(Alarm.of(
-                    parent.getUser(),
-                    AlarmArgs.of(postId, userPrincipalUsername),
+                    user,
+                    AlarmArgs.of(post.getId(), userPrincipalUsername),
                     AlarmType.TEAM_COMMENT));
         }
-        alarmService.send(alarm.getId(), parent.getUser().getId());
+        alarmService.send(alarm.getId(), user.getId());
     }
 
     @Transactional
@@ -212,15 +208,15 @@ public class PostService {
     }
 
     @Transactional
-    public void addMember(Long id, String username) {
-        User user = userRepository.findByUsername(username)
+    public void addMember(Long id, String userPrincipalUsername) {
+        User user = userRepository.findByUsername(userPrincipalUsername)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
         TeamBuildingPost post = postRepository.findTeamPostById(id)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
         if (!post.checkLimits()) {
             post.getMembers()
                     .stream()
-                    .filter(e -> e.getUsername().equals(username))
+                    .filter(e -> e.getUsername().equals(userPrincipalUsername))
                     .findAny().ifPresent(it -> {
                         throw new OlaApplicationException(ErrorCode.DUPLICATED_MEMBER);
                     });
@@ -232,16 +228,18 @@ public class PostService {
         } else {
             throw new OlaApplicationException(ErrorCode.BAD_REQUEST);
         }
-        sendAlarmToAllMembers(username, post);
+        sendAlarmToAllMembers(userPrincipalUsername, post);
     }
 
-    private void sendAlarmToAllMembers(String username, TeamBuildingPost post) {
+    private void sendAlarmToAllMembers(String userPrincipalUsername, TeamBuildingPost post) {
         post.getMembers().forEach(e -> {
-            Alarm alarm = alarmRepository.save(Alarm.of(
-                    e,
-                    AlarmArgs.of(post.getId(), username),
-                    AlarmType.JOIN));
-            alarmService.send(alarm.getId(), e.getId());
+            if (!e.getUsername().equals(userPrincipalUsername)){
+                Alarm alarm = alarmRepository.save(Alarm.of(
+                        e,
+                        AlarmArgs.of(post.getId(), userPrincipalUsername),
+                        AlarmType.JOIN));
+                alarmService.send(alarm.getId(), e.getId());
+            }
         });
     }
 
@@ -252,6 +250,10 @@ public class PostService {
         TeamBuildingPost post = postRepository.findTeamPostById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
         if (!user.getUsername().equals(userPrincipalUsername)) {
+            throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
+        }
+        if (post.getUser().getUsername().equals(userPrincipalUsername)) {
+            // 방장은 나갈 수 없음
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
         post.getMembers().remove(user);

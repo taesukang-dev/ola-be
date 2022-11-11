@@ -33,4 +33,10 @@ public class AlarmRepository {
     public void remove(Alarm alarm) {
         em.remove(alarm);
     }
+
+    public void deleteByPostId(Long postId) {
+        em.createQuery("UPDATE Alarm a SET deleted_at = NOW() where a.args.postId=:postId")
+                .setParameter("postId", postId)
+                .executeUpdate();
+    }
 }
