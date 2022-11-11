@@ -237,49 +237,49 @@ class PostControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    @Test
-    void 팀빌딩_게시물_수정() throws Exception {
-        // given
-        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "place");
-        when(postService.updateTeamPost(any(), any())).thenReturn(TeamPostDto.fromPost(TeamPostFixture.makeFixture()));
-        // when then
-        mockMvc.perform(put("/api/v1/posts/team")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(param))
-                ).andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    @Test
-    void 팀빌딩_게시물_수정시_자신의_게시글이_아닌경우() throws Exception {
-        // given
-        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "place");
-        doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
-                .when(postService).updateTeamPost(any(), any());
-        // when then
-        mockMvc.perform(put("/api/v1/posts/team")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(param))
-                ).andDo(print())
-                .andExpect(status().isUnauthorized());
-    }
-
-    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    @Test
-    void 팀빌딩_게시물_수정시_게시글이_없는경우() throws Exception {
-        // given
-        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "place");
-        doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
-                .when(postService).updateTeamPost(any(), any());
-        // when then
-        mockMvc.perform(put("/api/v1/posts/team")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(param))
-                ).andDo(print())
-                .andExpect(status().isNotFound());
-    }
+//    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+//    @Test
+//    void 팀빌딩_게시물_수정() throws Exception {
+//        // given
+//        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "place");
+//        when(postService.updateTeamPost(any(), any())).thenReturn(TeamPostDto.fromPost(TeamPostFixture.makeFixture()));
+//        // when then
+//        mockMvc.perform(put("/api/v1/posts/team")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsBytes(param))
+//                ).andDo(print())
+//                .andExpect(status().isOk());
+//    }
+//
+//    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+//    @Test
+//    void 팀빌딩_게시물_수정시_자신의_게시글이_아닌경우() throws Exception {
+//        // given
+//        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "place");
+//        doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
+//                .when(postService).updateTeamPost(any(), any());
+//        // when then
+//        mockMvc.perform(put("/api/v1/posts/team")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsBytes(param))
+//                ).andDo(print())
+//                .andExpect(status().isUnauthorized());
+//    }
+//
+//    @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+//    @Test
+//    void 팀빌딩_게시물_수정시_게시글이_없는경우() throws Exception {
+//        // given
+//        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "place");
+//        doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+//                .when(postService).updateTeamPost(any(), any());
+//        // when then
+//        mockMvc.perform(put("/api/v1/posts/team")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsBytes(param))
+//                ).andDo(print())
+//                .andExpect(status().isNotFound());
+//    }
 
     @WithUserDetails(value = "asd", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test

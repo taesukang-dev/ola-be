@@ -271,47 +271,47 @@ class PostServiceTest {
         assertThat(result.size()).isEqualTo(10);
     }
 
-    @Test
-    void 팀빌딩_게시물_수정() throws Exception {
-        // given
-        User user = new User("user1", "password1", "nick1", "name1", 30L, "home");
-        TeamPostWriteRequest postWriteRequest = new TeamPostWriteRequest("title1", "content1", "user1", "place1", 3L);
-        TeamBuildingPost post = TeamBuildingPost.of(user, postWriteRequest.getTitle(), postWriteRequest.getContent(), postWriteRequest.getPlace(), postWriteRequest.getLimits());
-        TeamPostUpdateRequest param = new TeamPostUpdateRequest(post.getId(), "updated", "updated", "updated");
-        // when
-        when(postRepository.saveTeamPost(any())).thenReturn(post);
-        when(postRepository.findTeamPostById(post.getId())).thenReturn(Optional.of(post));
-        // then
-        TeamPostDto updatedPost = postService.updateTeamPost(param, "user1");
-        assertThat(updatedPost.getTitle()).isEqualTo(param.getTitle());
-        assertThat(updatedPost.getContent()).isEqualTo(param.getContent());
-    }
-
-    @Test
-    void 팀빌딩_게시물_수정시_게시물이_존재하지_않는경우() throws Exception {
-        // given
-        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "updated", "updated", "updated");
-        // when
-        when(postRepository.findTeamPostById(any())).thenReturn(Optional.empty());
-        // then
-        assertThatThrownBy(() -> postService.updateTeamPost(param, "user1"))
-                .isInstanceOf(OlaApplicationException.class);
-    }
-
-    @Test
-    void 팀빌딩_게시물_수정시_권한이_없는경우() throws Exception {
-        // given
-        User user = new User("user1", "password1", "nick1", "name1", 30L, "home");
-        TeamPostWriteRequest postWriteRequest = new TeamPostWriteRequest("title1", "content1", "user1", "place1", 3L);
-        TeamBuildingPost post = TeamBuildingPost.of(user, postWriteRequest.getTitle(), postWriteRequest.getContent(), postWriteRequest.getPlace(), postWriteRequest.getLimits());
-        TeamPostUpdateRequest param = new TeamPostUpdateRequest(post.getId(), "updated", "updated", "updated");
-        // when
-        when(postRepository.saveTeamPost(any())).thenReturn(post);
-        when(postRepository.findTeamPostById(post.getId())).thenReturn(Optional.of(post));
-        // then
-        assertThatThrownBy(() -> postService.updateTeamPost(param, "none"))
-                .isInstanceOf(OlaApplicationException.class);
-    }
+//    @Test
+//    void 팀빌딩_게시물_수정() throws Exception {
+//        // given
+//        User user = new User("user1", "password1", "nick1", "name1", 30L, "home");
+//        TeamPostWriteRequest postWriteRequest = new TeamPostWriteRequest("title1", "content1", "user1", "place1", 3L);
+//        TeamBuildingPost post = TeamBuildingPost.of(user, postWriteRequest.getTitle(), postWriteRequest.getContent(), postWriteRequest.getPlace(), postWriteRequest.getLimits());
+//        TeamPostUpdateRequest param = new TeamPostUpdateRequest(post.getId(), "updated", "updated", "updated");
+//        // when
+//        when(postRepository.saveTeamPost(any())).thenReturn(post);
+//        when(postRepository.findTeamPostById(post.getId())).thenReturn(Optional.of(post));
+//        // then
+//        TeamPostDto updatedPost = postService.updateTeamPost(param, "user1");
+//        assertThat(updatedPost.getTitle()).isEqualTo(param.getTitle());
+//        assertThat(updatedPost.getContent()).isEqualTo(param.getContent());
+//    }
+//
+//    @Test
+//    void 팀빌딩_게시물_수정시_게시물이_존재하지_않는경우() throws Exception {
+//        // given
+//        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "updated", "updated", "updated");
+//        // when
+//        when(postRepository.findTeamPostById(any())).thenReturn(Optional.empty());
+//        // then
+//        assertThatThrownBy(() -> postService.updateTeamPost(param, "user1"))
+//                .isInstanceOf(OlaApplicationException.class);
+//    }
+//
+//    @Test
+//    void 팀빌딩_게시물_수정시_권한이_없는경우() throws Exception {
+//        // given
+//        User user = new User("user1", "password1", "nick1", "name1", 30L, "home");
+//        TeamPostWriteRequest postWriteRequest = new TeamPostWriteRequest("title1", "content1", "user1", "place1", 3L);
+//        TeamBuildingPost post = TeamBuildingPost.of(user, postWriteRequest.getTitle(), postWriteRequest.getContent(), postWriteRequest.getPlace(), postWriteRequest.getLimits());
+//        TeamPostUpdateRequest param = new TeamPostUpdateRequest(post.getId(), "updated", "updated", "updated");
+//        // when
+//        when(postRepository.saveTeamPost(any())).thenReturn(post);
+//        when(postRepository.findTeamPostById(post.getId())).thenReturn(Optional.of(post));
+//        // then
+//        assertThatThrownBy(() -> postService.updateTeamPost(param, "none"))
+//                .isInstanceOf(OlaApplicationException.class);
+//    }
 
     @Test
     void 팀빌딩_게시물_삭제() throws Exception {

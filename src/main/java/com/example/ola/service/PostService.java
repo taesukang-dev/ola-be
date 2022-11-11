@@ -77,7 +77,7 @@ public class PostService {
         if (!foundedPost.getUser().getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        foundedPost.update(param.getTitle(), param.getContent(), param.getPlace());
+        foundedPost.update(param.getTitle(), param.getContent(), param.getPlace(), param.getLimits());
         return TeamPostDto.fromPost(foundedPost);
     }
 
