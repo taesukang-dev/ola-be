@@ -5,11 +5,13 @@ import com.example.ola.dto.request.UserRequest;
 import com.example.ola.dto.response.Response;
 import com.example.ola.dto.response.UserJoinResponse;
 import com.example.ola.dto.security.UserPrincipal;
+import com.example.ola.service.AlarmService;
 import com.example.ola.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.validation.Valid;
 
@@ -19,6 +21,7 @@ import javax.validation.Valid;
 @RestController
 public class UserController {
     private final UserService userService;
+    private final AlarmService alarmService;
 
     @GetMapping
     public Response<UserJoinResponse> userInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -35,4 +38,8 @@ public class UserController {
         return Response.success(userService.login(request.getUsername(), request.getPassword()));
     }
 
+    @GetMapping("/alarm/subscribe")
+    public SseEmitter subscribe(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return alarmService.connectAlarm(userPrincipal.getId());
+    }
 }
