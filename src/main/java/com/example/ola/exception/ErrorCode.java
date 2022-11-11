@@ -15,6 +15,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "Post not found"),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "Comment not found"),
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "Alarm not found"),
+    ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting alarm occurs Error"),
     ;
 
     private HttpStatus status;
