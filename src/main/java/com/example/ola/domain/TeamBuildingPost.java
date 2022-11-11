@@ -33,9 +33,10 @@ public class TeamBuildingPost extends Post {
         return new TeamBuildingPost(user, title, content, place, limits);
     }
 
-    public void update(String title, String content, String place) {
+    public void update(String title, String content, String place, Long limits) {
         this.update(title, content);
         this.place = place;
+        this.limits = limits;
     }
 
 
