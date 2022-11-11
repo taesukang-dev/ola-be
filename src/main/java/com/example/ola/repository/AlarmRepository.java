@@ -13,8 +13,9 @@ import java.util.Optional;
 public class AlarmRepository {
     private final EntityManager em;
 
-    public void save(Alarm alarm) {
+    public Alarm save(Alarm alarm) {
         em.persist(alarm);
+        return alarm;
     }
 
     public Optional<Alarm> findById(Long alarmId) {

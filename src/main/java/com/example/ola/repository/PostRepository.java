@@ -61,7 +61,7 @@ public class PostRepository {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
                         " order by p.id desc", TeamBuildingPost.class)
-                .setFirstResult(start * 10)
+                .setFirstResult(start * 9)
                 .setMaxResults(9)
                 .getResultList());
     }

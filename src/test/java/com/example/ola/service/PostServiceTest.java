@@ -22,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -167,7 +166,7 @@ class PostServiceTest {
         Post post = Post.of(user, postWriteRequest.getTitle(), postWriteRequest.getContent());
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
         // when
-        postService.removePost(post.getId(), user.getUsername());
+        postService.delete(post.getId(), user.getUsername());
         // then
         assertThatNoException();
     }
@@ -178,7 +177,7 @@ class PostServiceTest {
         when(postRepository.findById(any())).thenReturn(Optional.empty());
         // when
         // then
-        assertThatThrownBy(() -> postService.removePost(1L, "asd"))
+        assertThatThrownBy(() -> postService.delete(1L, "asd"))
                 .isInstanceOf(OlaApplicationException.class);
     }
 
@@ -191,7 +190,7 @@ class PostServiceTest {
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
         // when
         // then
-        assertThatThrownBy(() -> postService.removePost(1L, "asd"))
+        assertThatThrownBy(() -> postService.delete(1L, "asd"))
                 .isInstanceOf(OlaApplicationException.class);
     }
 
@@ -427,7 +426,7 @@ class PostServiceTest {
         when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         doNothing().when(commentRepository).delete(any());
         // when
-        postService.delete(1L, "user1", 1L);
+        postService.deleteComment(1L, "user1", 1L);
         // then
         assertThatNoException();
     }
@@ -440,7 +439,7 @@ class PostServiceTest {
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
         when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         // when then
-        assertThatThrownBy(() -> postService.delete(1L, "none", 1L))
+        assertThatThrownBy(() -> postService.deleteComment(1L, "none", 1L))
                 .isInstanceOf(OlaApplicationException.class);
     }
 
@@ -453,7 +452,7 @@ class PostServiceTest {
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
         when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         // when then
-        assertThatThrownBy(() -> postService.delete(1L, "none", 1L))
+        assertThatThrownBy(() -> postService.deleteComment(1L, "none", 1L))
                 .isInstanceOf(OlaApplicationException.class);
     }
 }

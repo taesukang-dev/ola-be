@@ -35,4 +35,10 @@ public class CommentRepository {
     public void delete(Comment comment) {
         em.remove(comment);
     }
+
+    public void deleteByPostId(Long postId) {
+        em.createQuery("UPDATE Comment c SET deleted_at = NOW() where c.post.id=:postId")
+                .setParameter("postId", postId)
+                .executeUpdate();
+    }
 }
