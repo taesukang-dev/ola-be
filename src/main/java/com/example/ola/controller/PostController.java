@@ -19,11 +19,24 @@ import java.util.stream.Collectors;
 public class PostController {
     private final PostService postService;
 
+    @GetMapping
+    public Response<List<PostResponse>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return Response.success(postService.findPostsByUsername(userPrincipal.getUsername())
+                .stream().map(PostResponse::fromPostDto)
+                .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/team")
+    public Response<List<TeamPostResponse>> getMyTeamPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return Response.success(postService.findTeamPostByUsername(userPrincipal.getUsername())
+                .stream().map(TeamPostResponse::fromTeamPostDto)
+                .collect(Collectors.toList()));
+    }
+
     @PostMapping
     public Response<PostResponse> write(
             @RequestBody PostWriteRequest postWriteRequest,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-
         return Response.success(PostResponse.fromPostDto(postService.write(postWriteRequest, userPrincipal.getUsername())));
     }
 

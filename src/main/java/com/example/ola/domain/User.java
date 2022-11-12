@@ -30,6 +30,12 @@ public class User {
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
+    public void updateUser(String name, String nickname, String homeGym) {
+        this.name = name;
+        this.nickname = nickname;
+        this.homeGym = homeGym;
+    }
+
     public User(String username, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
         this.username = username;
         this.password = password;

@@ -1,0 +1,31 @@
+package com.example.ola.dto.response;
+
+import com.example.ola.dto.UserDto;
+
+import com.example.ola.dto.security.UserPrincipal;
+import lombok.Data;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class UserResponse {
+    private Long id;
+    private String userId;
+    private String nickname;
+    private String name;
+    private Long ageRange;
+    private String homeGym;
+    private String userGender;
+
+    public static UserResponse fromUserDto(UserDto userDto) {
+        return new UserResponse(userDto.getId(), userDto.getUsername(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGym(), userDto.getGender());
+    }
+
+    public static UserResponse fromUserPrincipal(UserPrincipal userPrincipal) {
+        return new UserResponse(userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getNickname(), userPrincipal.getName(), userPrincipal.getAgeRange(), userPrincipal.getHomeGym(), userPrincipal.getUserGender());
+    }
+}

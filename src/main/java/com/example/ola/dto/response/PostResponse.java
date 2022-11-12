@@ -1,8 +1,6 @@
 package com.example.ola.dto.response;
 
-import com.example.ola.domain.Post;
 import com.example.ola.dto.PostDto;
-import com.example.ola.dto.UserDto;
 import lombok.Data;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
@@ -16,7 +14,7 @@ import java.sql.Timestamp;
 @Builder
 public class PostResponse {
     private Long id;
-    private UserJoinResponse user;
+    private UserResponse user;
     private String title;
     private String content;
     private Timestamp registeredAt;
@@ -24,7 +22,7 @@ public class PostResponse {
     public static PostResponse fromPostDto(PostDto post) {
         return new PostResponse(
                 post.getId(),
-                UserJoinResponse.fromUserDto(post.getUserDto()),
+                UserResponse.fromUserDto(post.getUserDto()),
                 post.getTitle(),
                 post.getContent(),
                 post.getRegisteredAt()
