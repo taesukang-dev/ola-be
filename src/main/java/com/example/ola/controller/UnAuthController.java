@@ -17,19 +17,13 @@ public class UnAuthController {
     private final PostService postService;
 
     @GetMapping
-    public Response<List<PostResponse>> postList(@RequestParam(required = false, defaultValue = "0") int page) {
-        return Response.success(
-                postService.findAllPostsWithPaging(page)
-                        .stream().map(PostResponse::fromPostDto)
-                        .collect(Collectors.toList()));
+    public Response<List<List<?>>> postList(@RequestParam(required = false, defaultValue = "0") int page) {
+        return Response.success(postService.findAllPostsWithPaging(page));
     }
 
     @GetMapping("/team")
-    public Response<List<TeamPostResponse>> teamPostList(@RequestParam(required = false, defaultValue = "0") int page) {
-        return Response.success(
-                postService.findAllTeamPostsWithPaging(page)
-                    .stream().map(TeamPostResponse::fromTeamPostDto)
-                    .collect(Collectors.toList()));
+    public Response<List<List<?>>> teamPostList(@RequestParam(required = false, defaultValue = "0") int page) {
+        return Response.success(postService.findAllTeamPostsWithPaging(page));
     }
 
     @GetMapping("/{postId}")
@@ -41,4 +35,5 @@ public class UnAuthController {
     public Response<TeamPostResponse> teamPost(@PathVariable Long postId) {
         return Response.success(TeamPostResponse.fromTeamPostDto(postService.findTeamPostById(postId)));
     }
+
 }
