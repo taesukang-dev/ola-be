@@ -17,8 +17,10 @@ public class UnAuthController {
     private final PostService postService;
 
     @GetMapping
-    public Response<List<List<?>>> postList(@RequestParam(required = false, defaultValue = "0") int page) {
-        return Response.success(postService.findAllPostsWithPaging(page));
+    public Response<List<List<?>>> postList(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "") String keyword) {
+        return Response.success(postService.findAllPostsWithPaging(page, keyword));
     }
 
     @GetMapping("/team")
