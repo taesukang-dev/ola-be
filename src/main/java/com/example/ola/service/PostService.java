@@ -6,6 +6,8 @@ import com.example.ola.dto.CommentDto;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.TeamPostDto;
 import com.example.ola.dto.request.*;
+import com.example.ola.dto.response.PostResponse;
+import com.example.ola.dto.response.TeamPostResponse;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.repository.AlarmRepository;
@@ -13,12 +15,15 @@ import com.example.ola.repository.CommentRepository;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -91,18 +96,24 @@ public class PostService {
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
     }
 
-    public List<PostDto> findAllPostsWithPaging(int start) {
-        return postRepository.findAllPostsWithPaging(start)
+    public List<List<?>> findAllPostsWithPaging(int start) {
+        List<PostResponse> postList = postRepository.findAllPostsWithPaging(start)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .stream().map(PostDto::fromPost)
+                .map(PostResponse::fromPostDto)
                 .collect(Collectors.toList());
+        List<Integer> pageList = getPageList(PostType.POST, start);
+        return List.of(postList, pageList);
     }
 
-    public List<TeamPostDto> findAllTeamPostsWithPaging(int start) {
-        return postRepository.findAllTeamPostsWithPaging(start)
+    public List<List<?>> findAllTeamPostsWithPaging(int start) {
+        List<TeamPostResponse> postList = postRepository.findAllTeamPostsWithPaging(start)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .stream().map(TeamPostDto::fromPost)
+                .map(TeamPostResponse::fromTeamPostDto)
                 .collect(Collectors.toList());
+        List<Integer> pageList = getPageList(PostType.TEAM_POST, start);
+        return List.of(postList, pageList);
     }
 
     @Transactional
@@ -138,7 +149,7 @@ public class PostService {
     }
 
     @Transactional
-    public void writeComment(Long postId, String userPrincipalUsername, String content, CommentWriteRequestType type) {
+    public void writeComment(Long postId, String userPrincipalUsername, String content, PostType type) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
         User user = userRepository.findByUsername(userPrincipalUsername)
@@ -148,7 +159,7 @@ public class PostService {
     }
 
     @Transactional
-    public void writeComment(Long postId, Long parentId, String userPrincipalUsername, String content, CommentWriteRequestType type) {
+    public void writeComment(Long postId, Long parentId, String userPrincipalUsername, String content, PostType type) {
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.COMMENT_NOT_FOUND));
         User user = userRepository.findByUsername(userPrincipalUsername)
@@ -159,7 +170,7 @@ public class PostService {
         selectAlarmTypeAndSend(type, parent.getUser(), post, userPrincipalUsername);
     }
 
-    private void selectAlarmTypeAndSend(CommentWriteRequestType type, User user, Post post, String userPrincipalUsername) {
+    private void selectAlarmTypeAndSend(PostType type, User user, Post post, String userPrincipalUsername) {
         Alarm alarm;
         if (userPrincipalUsername.equals(user.getUsername())) {
             return ;
@@ -258,4 +269,20 @@ public class PostService {
         }
         post.getMembers().remove(user);
     }
+
+    public List<Integer> getPageList(PostType postType, Integer currentPage) {
+        int result;
+        int total;
+        if (postType == PostType.POST) {
+            result = postRepository.getPostCount("post").intValue();
+            total = (int) Math.ceil((float) result / 10);
+        } else {
+            result = postRepository.getPostCount("T").intValue();
+            total = (int) Math.ceil((float) result / 9);
+        }
+        int startNumber = Math.max(currentPage - (5 / 2), 0);
+        int endNumber = Math.min(startNumber + 5, total);
+        return IntStream.range(startNumber, endNumber).boxed().collect(Collectors.toList());
+    }
+
 }
