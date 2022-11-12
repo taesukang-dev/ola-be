@@ -66,6 +66,13 @@ public class PostRepository {
                 .getResultList());
     }
 
+    public Long getPostCount(String type) {
+        return em.createQuery("select count(*) from Post p" +
+                        " where dtype=:type", Long.class)
+                .setParameter("type", type)
+                .getSingleResult();
+    }
+
     public void remove(Post post) {
         em.remove(post);
     }
