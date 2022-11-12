@@ -60,7 +60,7 @@ public class PostService {
                 teamPostWriteRequest.getContent(),
                 teamPostWriteRequest.getPlace(),
                 teamPostWriteRequest.getLimits());
-        post.getMembers().add(post.getUser());
+        post.getMembers().add(TeamMember.of(post, post.getUser()));
         return TeamPostDto.fromPost(postRepository.saveTeamPost(post));
     }
 
@@ -106,6 +106,14 @@ public class PostService {
         return List.of(postList, pageList);
     }
 
+    // 없을 때에는 빈 list 반환
+    public List<PostDto> findPostsByUsername(String userPrincipalUsername) {
+        return postRepository.findPostsByUsername(userPrincipalUsername)
+                .map(e -> e.stream().map(PostDto::fromPost)
+                        .collect(Collectors.toList()))
+                .orElseGet(List::of);
+    }
+
     public List<List<?>> findAllTeamPostsWithPaging(int start) {
         List<TeamPostResponse> postList = postRepository.findAllTeamPostsWithPaging(start)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
@@ -114,6 +122,13 @@ public class PostService {
                 .collect(Collectors.toList());
         List<Integer> pageList = getPageList(PostType.TEAM_POST, start);
         return List.of(postList, pageList);
+    }
+
+    public List<TeamPostDto> findTeamPostByUsername(String userPrincipalUsername) {
+        return postRepository.findJoinedTeamPostByUsername(userPrincipalUsername)
+                .map(e -> e.stream().map(TeamPostDto::fromPost)
+                        .collect(Collectors.toList()))
+                .orElseGet(List::of);
     }
 
     @Transactional
@@ -173,7 +188,7 @@ public class PostService {
     private void selectAlarmTypeAndSend(PostType type, User user, Post post, String userPrincipalUsername) {
         Alarm alarm;
         if (userPrincipalUsername.equals(user.getUsername())) {
-            return ;
+            return;
         }
         if (type.getName().equals("post")) {
             alarm = alarmRepository.save(Alarm.of(
@@ -227,11 +242,11 @@ public class PostService {
         if (!post.checkLimits()) {
             post.getMembers()
                     .stream()
-                    .filter(e -> e.getUsername().equals(userPrincipalUsername))
+                    .filter(e -> e.getUser().getUsername().equals(userPrincipalUsername))
                     .findAny().ifPresent(it -> {
                         throw new OlaApplicationException(ErrorCode.DUPLICATED_MEMBER);
                     });
-            post.getMembers().add(user);
+            post.getMembers().add(TeamMember.of(post, user));
             // TODO : 방장이 확인하면 confirmed로
             if (post.getMembers().size() == post.getLimits()) {
                 post.updateStatus(TeamBuildingStatus.CONFIRMED);
@@ -244,12 +259,12 @@ public class PostService {
 
     private void sendAlarmToAllMembers(String userPrincipalUsername, TeamBuildingPost post) {
         post.getMembers().forEach(e -> {
-            if (!e.getUsername().equals(userPrincipalUsername)){
+            if (!e.getUser().getUsername().equals(userPrincipalUsername)) {
                 Alarm alarm = alarmRepository.save(Alarm.of(
-                        e,
+                        e.getUser(),
                         AlarmArgs.of(post.getId(), userPrincipalUsername),
                         AlarmType.JOIN));
-                alarmService.send(alarm.getId(), e.getId());
+                alarmService.send(alarm.getId(), e.getUser().getId());
             }
         });
     }
@@ -267,7 +282,8 @@ public class PostService {
             // 방장은 나갈 수 없음
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        post.getMembers().remove(user);
+        TeamMember teamMember = postRepository.findTeamMemberByPostIdAndUserId(postId, userId);
+        post.getMembers().remove(teamMember);
     }
 
     public List<Integer> getPageList(PostType postType, Integer currentPage) {

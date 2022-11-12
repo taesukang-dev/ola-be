@@ -2,6 +2,7 @@ package com.example.ola.repository;
 
 import com.example.ola.domain.Post;
 import com.example.ola.domain.TeamBuildingPost;
+import com.example.ola.domain.TeamMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -26,6 +27,15 @@ public class PostRepository {
         return post;
     }
 
+    public TeamMember findTeamMemberByPostIdAndUserId(Long postId, Long userId) {
+        return em.createQuery("select m from TeamMember m" +
+                        " where m.post.id=:postId" +
+                        " and m.user.id=:userId", TeamMember.class)
+                .setParameter("postId", postId)
+                .setParameter("userId", userId)
+                .getSingleResult();
+    }
+
     public Optional<Post> findById(Long postId) {
         return Optional.ofNullable(
                 em.createQuery("select p from Post p" +
@@ -40,6 +50,7 @@ public class PostRepository {
         return Optional.ofNullable(
                 em.createQuery("select p from TeamBuildingPost p" +
                                 " join fetch p.user" +
+                                " join fetch p.members" +
                                 " where p.id =:postId", TeamBuildingPost.class)
                         .setParameter("postId", postId)
                         .getSingleResult()
@@ -57,6 +68,18 @@ public class PostRepository {
                 .getResultList());
     }
 
+    public Optional<List<Post>> findPostsByUsername(String username) {
+        return Optional.ofNullable(em.createQuery("select p from Post p" +
+                        " join fetch p.user" +
+                        " where dtype =:post" +
+                        " and p.user.username=:username" +
+                        " order by p.id desc", Post.class)
+                .setParameter("post", "post")
+                .setParameter("username", username)
+                .setMaxResults(10)
+                .getResultList());
+    }
+
     public Optional<List<TeamBuildingPost>> findAllTeamPostsWithPaging(int start) {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
@@ -64,6 +87,28 @@ public class PostRepository {
                 .setFirstResult(start * 9)
                 .setMaxResults(9)
                 .getResultList());
+    }
+
+    public Optional<List<TeamBuildingPost>> findTeamPostsByUsername(String username) {
+        return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
+                        " join fetch p.user" +
+                        " where p.user.username=:username" +
+                        " order by p.id desc", TeamBuildingPost.class)
+                .setParameter("username", username)
+                .setMaxResults(9)
+                .getResultList());
+    }
+
+    public Optional<List<TeamBuildingPost>> findJoinedTeamPostByUsername(String username) {
+        return Optional.ofNullable(
+                em.createQuery("select p from TeamBuildingPost p" +
+                                        " where p.id" +
+                                        " in (select distinct t.post.id from TeamMember t" +
+                                        " where t.user.username=:username" +
+                                        " and t.deletedAt is null)"
+                                , TeamBuildingPost.class)
+                        .setParameter("username", username)
+                        .getResultList());
     }
 
     public Long getPostCount(String type) {
