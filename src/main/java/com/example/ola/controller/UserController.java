@@ -2,8 +2,9 @@ package com.example.ola.controller;
 
 import com.example.ola.dto.request.UserLoginRequest;
 import com.example.ola.dto.request.UserRequest;
+import com.example.ola.dto.request.UserUpdateRequest;
 import com.example.ola.dto.response.Response;
-import com.example.ola.dto.response.UserJoinResponse;
+import com.example.ola.dto.response.UserResponse;
 import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.service.AlarmService;
 import com.example.ola.service.UserService;
@@ -24,18 +25,25 @@ public class UserController {
     private final AlarmService alarmService;
 
     @GetMapping
-    public Response<UserJoinResponse> userInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return Response.success(UserJoinResponse.fromUserPrincipal(userPrincipal));
+    public Response<UserResponse> userInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return Response.success(UserResponse.fromUserPrincipal(userPrincipal));
     }
 
     @PostMapping("/join")
-    public Response<UserJoinResponse> join(@RequestBody @Valid UserRequest userRequest) {
-        return Response.success(UserJoinResponse.fromUserDto(userService.join(userRequest)));
+    public Response<UserResponse> join(@RequestBody @Valid UserRequest userRequest) {
+        return Response.success(UserResponse.fromUserDto(userService.join(userRequest)));
     }
 
     @PostMapping("/login")
     public Response<String> login(@RequestBody UserLoginRequest request) {
         return Response.success(userService.login(request.getUsername(), request.getPassword()));
+    }
+
+    @PostMapping("/update")
+    public Response<UserResponse> update(
+            @RequestBody UserUpdateRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return Response.success(UserResponse.fromUserDto(userService.updateUser(userPrincipal.getUsername(), request)));
     }
 
     @GetMapping("/alarm/subscribe")
