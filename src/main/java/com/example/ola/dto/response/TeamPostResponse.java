@@ -17,25 +17,25 @@ import java.util.stream.Collectors;
 @Builder
 public class TeamPostResponse {
     private Long id;
-    private UserJoinResponse user;
+    private UserResponse user;
     private String title;
     private String content;
     private String place;
     private Long limits;
-    private List<UserJoinResponse> member;
+    private List<UserResponse> member;
     private Timestamp registeredAt;
     private TeamBuildingStatus status;
 
     public static TeamPostResponse fromTeamPostDto(TeamPostDto teamBuildingPost) {
         return new TeamPostResponse(
                 teamBuildingPost.getId(),
-                UserJoinResponse.fromUserDto(teamBuildingPost.getUserDto()),
+                UserResponse.fromUserDto(teamBuildingPost.getUserDto()),
                 teamBuildingPost.getTitle(),
                 teamBuildingPost.getContent(),
                 teamBuildingPost.getPlace(),
                 teamBuildingPost.getLimits(),
-                teamBuildingPost.getMember()
-                        .stream().map(UserJoinResponse::fromUserDto)
+                teamBuildingPost.getMembers()
+                        .stream().map(UserResponse::fromUserDto)
                         .collect(Collectors.toList()),
                 teamBuildingPost.getRegisteredAt(),
                 teamBuildingPost.getStatus()

@@ -17,8 +17,9 @@ import java.util.List;
 public class TeamBuildingPost extends Post {
     private String place;
     private Long limits;
-    @ManyToMany
-    private List<User> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamMember> members = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     TeamBuildingStatus teamBuildingStatus = TeamBuildingStatus.READY;

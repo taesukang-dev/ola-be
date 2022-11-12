@@ -1,9 +1,6 @@
 package com.example.ola.dto;
 
-import com.example.ola.domain.Post;
-import com.example.ola.domain.TeamBuildingPost;
-import com.example.ola.domain.TeamBuildingStatus;
-import com.example.ola.domain.User;
+import com.example.ola.domain.*;
 import lombok.Data;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
@@ -24,7 +21,7 @@ public class TeamPostDto {
     private String content;
     private String place;
     private Long limits;
-    private List<UserDto> member;
+    private List<UserDto> members;
     private Timestamp registeredAt;
     private TeamBuildingStatus status;
 
@@ -37,7 +34,7 @@ public class TeamPostDto {
                 teamBuildingPost.getPlace(),
                 teamBuildingPost.getLimits(),
                 teamBuildingPost.getMembers()
-                        .stream().map(UserDto::fromUser)
+                        .stream().map(e -> UserDto.fromUser(e.getUser()))
                         .collect(Collectors.toList()),
                 teamBuildingPost.getRegisteredAt(),
                 teamBuildingPost.getTeamBuildingStatus()
