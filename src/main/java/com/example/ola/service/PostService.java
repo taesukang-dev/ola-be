@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,11 +97,29 @@ public class PostService {
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
     }
 
-    public List<List<?>> findAllPostsWithPaging(int start) {
+    public List<List<?>> findAllPostsWithPaging(int start, String keyword) {
+        if (StringUtils.hasText(keyword)) {
+            return findAllPostsByKeyword(keyword, start);
+        }
         List<PostResponse> postList = postRepository.findAllPostsWithPaging(start)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .stream().map(PostDto::fromPost)
                 .map(PostResponse::fromPostDto)
+                .collect(Collectors.toList());
+        List<Integer> pageList = getPageList(PostType.POST, start);
+        return List.of(postList, pageList);
+    }
+
+    // TODO : search도 페이징 달아야하나??
+    public List<List<?>> findAllPostsByKeyword(String keyword, int start) {
+        if (!StringUtils.hasText(keyword)) {
+            throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
+        }
+        List<PostResponse> postList = postRepository.findAllPostsByKeyword(keyword)
+                .map(e -> e.stream().map(PostDto::fromPost)
+                        .collect(Collectors.toList()))
+                .orElseGet(List::of)
+                .stream().map(PostResponse::fromPostDto)
                 .collect(Collectors.toList());
         List<Integer> pageList = getPageList(PostType.POST, start);
         return List.of(postList, pageList);

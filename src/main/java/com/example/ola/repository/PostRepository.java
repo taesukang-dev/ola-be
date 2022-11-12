@@ -30,7 +30,8 @@ public class PostRepository {
     public TeamMember findTeamMemberByPostIdAndUserId(Long postId, Long userId) {
         return em.createQuery("select m from TeamMember m" +
                         " where m.post.id=:postId" +
-                        " and m.user.id=:userId", TeamMember.class)
+                        " and m.user.id=:userId" +
+                        " and m.deletedAt is null", TeamMember.class)
                 .setParameter("postId", postId)
                 .setParameter("userId", userId)
                 .getSingleResult();
@@ -41,17 +42,6 @@ public class PostRepository {
                 em.createQuery("select p from Post p" +
                                 " join fetch p.user" +
                                 " where p.id =:postId", Post.class)
-                        .setParameter("postId", postId)
-                        .getSingleResult()
-        );
-    }
-
-    public Optional<TeamBuildingPost> findTeamPostById(Long postId) {
-        return Optional.ofNullable(
-                em.createQuery("select p from TeamBuildingPost p" +
-                                " join fetch p.user" +
-                                " join fetch p.members" +
-                                " where p.id =:postId", TeamBuildingPost.class)
                         .setParameter("postId", postId)
                         .getSingleResult()
         );
@@ -68,6 +58,18 @@ public class PostRepository {
                 .getResultList());
     }
 
+    public Optional<List<Post>> findAllPostsByKeyword(String keyword) {
+        return Optional.ofNullable(em.createQuery("select p from Post p" +
+                        " join fetch p.user" +
+                        " where dtype =:post" +
+                        " and p.title like :keyword" +
+                        " order by p.id desc", Post.class)
+                .setParameter("post", "post")
+                .setParameter("keyword", "%" + keyword + "%")
+                .setMaxResults(10)
+                .getResultList());
+    }
+
     public Optional<List<Post>> findPostsByUsername(String username) {
         return Optional.ofNullable(em.createQuery("select p from Post p" +
                         " join fetch p.user" +
@@ -78,6 +80,17 @@ public class PostRepository {
                 .setParameter("username", username)
                 .setMaxResults(10)
                 .getResultList());
+    }
+
+    public Optional<TeamBuildingPost> findTeamPostById(Long postId) {
+        return Optional.ofNullable(
+                em.createQuery("select p from TeamBuildingPost p" +
+                                " join fetch p.user" +
+                                " join fetch p.members" +
+                                " where p.id =:postId", TeamBuildingPost.class)
+                        .setParameter("postId", postId)
+                        .getSingleResult()
+        );
     }
 
     public Optional<List<TeamBuildingPost>> findAllTeamPostsWithPaging(int start) {
