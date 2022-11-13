@@ -296,10 +296,6 @@ public class PostService {
                         throw new OlaApplicationException(ErrorCode.DUPLICATED_MEMBER);
                     });
             post.getMembers().add(TeamMember.of(post, user));
-            // TODO : 방장이 확인하면 confirmed로
-            if (post.getMembers().size() == post.getLimits()) {
-                post.updateStatus(TeamBuildingStatus.CONFIRMED);
-            }
         } else {
             throw new OlaApplicationException(ErrorCode.BAD_REQUEST);
         }
@@ -324,15 +320,31 @@ public class PostService {
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
         TeamBuildingPost post = postRepository.findTeamPostById(postId)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
-        if (!user.getUsername().equals(userPrincipalUsername)) {
+        // 방장이 아닌데 다른 유저를 삭제하려고 하는 경우
+        if (!userPrincipalUsername.equals(post.getUser().getUsername()) && !user.getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        if (post.getUser().getUsername().equals(userPrincipalUsername)) {
+        if (post.getUser().getUsername().equals(user.getUsername())) {
             // 방장은 나갈 수 없음
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
         TeamMember teamMember = postRepository.findTeamMemberByPostIdAndUserId(postId, userId);
         post.getMembers().remove(teamMember);
+    }
+
+    @Transactional
+    public void confirmTeam(Long postId, String userPrincipalUsername) {
+        TeamBuildingPost teamBuildingPost = postRepository.findTeamPostById(postId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        User user = userRepository.findByUsername(userPrincipalUsername)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        if (teamBuildingPost.getUser() != user) {
+            throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
+        }
+        if (teamBuildingPost.getMembers().size() != teamBuildingPost.getLimits()) {
+            throw new OlaApplicationException(ErrorCode.MEMBERS_NOT_ENOUGH);
+        }
+        teamBuildingPost.updateStatus(TeamBuildingStatus.CONFIRMED);
     }
 
     public List<Integer> getPageList(PostType postType, Integer currentPage) {
