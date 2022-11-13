@@ -23,7 +23,8 @@ public class CommentRepository {
                                 " join fetch c.user" +
                                 " join fetch c.post" +
                                 " where c.post.id =:postId" +
-                                " and c.parent is null")
+                                " and c.parent is null" +
+                                " order by c.id desc")
                         .setParameter("postId", postId)
                         .getResultList());
     }
