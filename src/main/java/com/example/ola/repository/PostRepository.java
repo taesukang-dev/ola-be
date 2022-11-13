@@ -102,6 +102,26 @@ public class PostRepository {
                 .getResultList());
     }
 
+    public Optional<List<TeamBuildingPost>> findAllTeamPostsByKeyword(String keyword) {
+        return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
+                        " join fetch p.user" +
+                        " where p.title like :keyword" +
+                        " order by p.id desc", TeamBuildingPost.class)
+                .setParameter("keyword", "%" + keyword + "%")
+                .setMaxResults(10)
+                .getResultList());
+    }
+
+    public Optional<List<TeamBuildingPost>> findAllTeamPostsByPlace(String place) {
+        return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
+                        " join fetch p.user" +
+                        " where p.place like :place" +
+                        " order by p.id desc", TeamBuildingPost.class)
+                .setParameter("place", "%" + place + "%")
+                .setMaxResults(10)
+                .getResultList());
+    }
+
     public Optional<List<TeamBuildingPost>> findTeamPostsByUsername(String username) {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
