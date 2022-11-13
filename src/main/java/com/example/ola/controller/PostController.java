@@ -89,9 +89,16 @@ public class PostController {
     public Response<Void> deleteMember(
             @PathVariable Long postId,
             @PathVariable Long memberId,
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         postService.removeTeamMember(postId, memberId, userPrincipal.getUsername());
+        return Response.success();
+    }
+
+    @GetMapping("/team/{postId}/confirm")
+    public Response<Void> confirmTeam(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        postService.confirmTeam(postId, userPrincipal.getUsername());
         return Response.success();
     }
 
