@@ -99,7 +99,7 @@ public class PostService {
 
     public List<List<?>> findAllPostsWithPaging(int start, String keyword) {
         if (StringUtils.hasText(keyword)) {
-            return findAllPostsByKeyword(keyword, start);
+            return findAllPostsByKeyword(keyword);
         }
         List<PostResponse> postList = postRepository.findAllPostsWithPaging(start)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
@@ -110,8 +110,7 @@ public class PostService {
         return List.of(postList, pageList);
     }
 
-    // TODO : search도 페이징 달아야하나??
-    public List<List<?>> findAllPostsByKeyword(String keyword, int start) {
+    public List<List<?>> findAllPostsByKeyword(String keyword) {
         if (!StringUtils.hasText(keyword)) {
             throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
         }
@@ -121,8 +120,7 @@ public class PostService {
                 .orElseGet(List::of)
                 .stream().map(PostResponse::fromPostDto)
                 .collect(Collectors.toList());
-        List<Integer> pageList = getPageList(PostType.POST, start);
-        return List.of(postList, pageList);
+        return List.of(postList, List.of());
     }
 
     // 없을 때에는 빈 list 반환
@@ -133,7 +131,13 @@ public class PostService {
                 .orElseGet(List::of);
     }
 
-    public List<List<?>> findAllTeamPostsWithPaging(int start) {
+    public List<List<?>> findAllTeamPostsWithPaging(int start, String keyword, String place) {
+        if (place.equals("장소")) {
+            return findAllTeamPostsByPlace(keyword);
+        }
+        if (StringUtils.hasText(keyword)) {
+            return findAllTeamPostsByKeyword(keyword);
+        }
         List<TeamPostResponse> postList = postRepository.findAllTeamPostsWithPaging(start)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .stream().map(TeamPostDto::fromPost)
@@ -141,6 +145,32 @@ public class PostService {
                 .collect(Collectors.toList());
         List<Integer> pageList = getPageList(PostType.TEAM_POST, start);
         return List.of(postList, pageList);
+    }
+
+    public List<List<?>> findAllTeamPostsByKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
+        }
+        List<TeamPostResponse> postList = postRepository.findAllTeamPostsByKeyword(keyword)
+                .map(e -> e.stream().map(TeamPostDto::fromPost)
+                        .collect(Collectors.toList()))
+                .orElseGet(List::of)
+                .stream().map(TeamPostResponse::fromTeamPostDto)
+                .collect(Collectors.toList());
+        return List.of(postList, List.of());
+    }
+
+    public List<List<?>> findAllTeamPostsByPlace(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
+        }
+        List<TeamPostResponse> postList = postRepository.findAllTeamPostsByPlace(keyword)
+                .map(e -> e.stream().map(TeamPostDto::fromPost)
+                        .collect(Collectors.toList()))
+                .orElseGet(List::of)
+                .stream().map(TeamPostResponse::fromTeamPostDto)
+                .collect(Collectors.toList());
+        return List.of(postList, List.of());
     }
 
     public List<TeamPostDto> findTeamPostByUsername(String userPrincipalUsername) {
