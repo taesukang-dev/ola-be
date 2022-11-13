@@ -17,6 +17,7 @@ public enum ErrorCode {
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "Alarm not found"),
     ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting alarm occurs Error"),
     INVALID_KEYWORD(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid keyword"),
+    MEMBERS_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "Not enough members"),
     ;
 
     private HttpStatus status;
