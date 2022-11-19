@@ -3,23 +3,21 @@ package com.example.ola.controller;
 import com.example.ola.dto.response.PostResponse;
 import com.example.ola.dto.response.Response;
 import com.example.ola.dto.response.TeamPostResponse;
-import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.service.PostService;
+import com.example.ola.service.TeamPostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/posts")
 @RestController
-public class UnAuthController {
+public class PublicController {
     private final PostService postService;
+    private final TeamPostService teamPostService;
 
     @GetMapping
     public Response<List<List<?>>> postList(
@@ -33,7 +31,7 @@ public class UnAuthController {
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "") String place) {
-        return Response.success(postService.findAllTeamPostsWithPaging(page, keyword, place));
+        return Response.success(teamPostService.findAllTeamPostsWithPaging(page, keyword, place));
     }
 
     @GetMapping("/{postId}")
@@ -43,7 +41,7 @@ public class UnAuthController {
 
     @GetMapping("/team/{postId}")
     public Response<TeamPostResponse> teamPost(@PathVariable Long postId) {
-        return Response.success(TeamPostResponse.fromTeamPostDto(postService.findTeamPostById(postId)));
+        return Response.success(TeamPostResponse.fromTeamPostDto(teamPostService.findTeamPostById(postId)));
     }
 
 }
