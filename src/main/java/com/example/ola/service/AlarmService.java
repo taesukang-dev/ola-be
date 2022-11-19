@@ -1,21 +1,29 @@
 package com.example.ola.service;
 
+import com.example.ola.domain.Alarm;
+import com.example.ola.dto.AlarmDto;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
+import com.example.ola.repository.AlarmRepository;
 import com.example.ola.repository.EmitterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
 public class AlarmService {
 
     private final EmitterRepository emitterRepository;
+    private final AlarmRepository alarmRepository;
     private final static Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
     private final static String ALARM_NAME = "alarm";
 
@@ -42,6 +50,20 @@ public class AlarmService {
             throw new OlaApplicationException(ErrorCode.ALARM_CONNECT_ERROR);
         }
         return sseEmitter;
+    }
+
+    @Transactional
+    public List<AlarmDto> alarms(String username) {
+        return alarmRepository.findByUsername(username)
+                .map(alarms -> alarms.stream().map(AlarmDto::fromAlarm)
+                        .collect(Collectors.toList())).orElseGet(List::of);
+    }
+
+    @Transactional
+    public void deleteAlarm(Long alarmId) {
+        Alarm alarm = alarmRepository.findById(alarmId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.ALARM_NOT_FOUND));
+        alarmRepository.remove(alarm);
     }
 
 }
