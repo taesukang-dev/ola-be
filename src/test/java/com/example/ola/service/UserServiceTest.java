@@ -30,10 +30,10 @@
 //    @Test
 //    void 회원가입() throws Exception {
 //        // given
-//        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음");
+//        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음", "M");
 //        when(userRepository.findByUsername("user1")).thenReturn(Optional.empty());
 //        when(userRepository.save(any()))
-//                .thenReturn(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음"));
+//                .thenReturn(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음", "M"));
 //        // when
 //        UserDto join = userService.join(userRequest);
 //        // then
@@ -43,13 +43,13 @@
 //        assertThat(join.getName()).isEqualTo("name1");
 //        assertThat(join.getAgeRange()).isEqualTo(20);
 //        assertThat(join.getHomeGym()).isEqualTo("없음");
-//
+//        assertThat(join.getGender()).isEqualTo("M");
 //    }
 //
 //    @Test
 //    void 회원가입시_중복일_경우() throws Exception {
-//        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음");
-//        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음")));
+//        UserRequest userRequest = new UserRequest("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음", "M");
+//        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음", "M")));
 //        assertThatThrownBy(() -> userService.join(userRequest))
 //                .isInstanceOf(OlaApplicationException.class);
 //    }
@@ -57,8 +57,8 @@
 //    @Test
 //    void 회원조회() throws Exception {
 //        // given when
-//        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음")));
-//        UserDto user1 = userService.findByUserName("user1");
+//        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(User.of("user1", "1q2w3e4r!!", "nickname1", "name1", 20L, "없음", "M")));
+//        UserDto user1 = userService.findByUsername("user1");
 //        // then
 //        assertThat(user1.getUsername()).isEqualTo("user1");
 //        assertThat(user1.getPassword()).isEqualTo("1q2w3e4r!!");
@@ -66,6 +66,7 @@
 //        assertThat(user1.getName()).isEqualTo("name1");
 //        assertThat(user1.getAgeRange()).isEqualTo(20);
 //        assertThat(user1.getHomeGym()).isEqualTo("없음");
+//        assertThat(user1.getGender()).isEqualTo("M");
 //    }
 //
 //    @Test

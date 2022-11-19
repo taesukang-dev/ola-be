@@ -5,6 +5,7 @@ import com.example.ola.dto.TeamPostDto;
 import com.example.ola.dto.request.PostType;
 import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
+import com.example.ola.dto.response.MyPageResponse;
 import com.example.ola.dto.response.TeamPostResponse;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
@@ -144,7 +145,7 @@ public class TeamPostService {
         teamBuildingPost.updateStatus(TeamBuildingStatus.CONFIRMED);
     }
 
-    public List<List<?>> findAllTeamPostsWithPaging(int start, String keyword, String place) {
+    public MyPageResponse findAllTeamPostsWithPaging(int start, String keyword, String place) {
         if (place.equals("장소")) {
             return findAllTeamPostsByPlace(keyword);
         }
@@ -157,10 +158,10 @@ public class TeamPostService {
                 .map(TeamPostResponse::fromTeamPostDto)
                 .collect(Collectors.toList());
         List<Integer> pageList = Paging.getPageList(teamPostRepository, PostType.TEAM_POST, start);
-        return List.of(postList, pageList);
+        return MyPageResponse.of(postList, pageList);
     }
 
-    public List<List<?>> findAllTeamPostsByKeyword(String keyword) {
+    public MyPageResponse findAllTeamPostsByKeyword(String keyword) {
         if (!StringUtils.hasText(keyword)) {
             throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
         }
@@ -170,10 +171,10 @@ public class TeamPostService {
                 .orElseGet(List::of)
                 .stream().map(TeamPostResponse::fromTeamPostDto)
                 .collect(Collectors.toList());
-        return List.of(postList, List.of());
+        return MyPageResponse.of(postList, List.of());
     }
 
-    public List<List<?>> findAllTeamPostsByPlace(String keyword) {
+    public MyPageResponse findAllTeamPostsByPlace(String keyword) {
         if (!StringUtils.hasText(keyword)) {
             throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
         }
@@ -183,6 +184,6 @@ public class TeamPostService {
                 .orElseGet(List::of)
                 .stream().map(TeamPostResponse::fromTeamPostDto)
                 .collect(Collectors.toList());
-        return List.of(postList, List.of());
+        return MyPageResponse.of(postList, List.of());
     }
 }

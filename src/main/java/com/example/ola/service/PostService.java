@@ -3,6 +3,7 @@ package com.example.ola.service;
 import com.example.ola.domain.*;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.request.*;
+import com.example.ola.dto.response.MyPageResponse;
 import com.example.ola.dto.response.PostResponse;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
@@ -60,7 +61,7 @@ public class PostService {
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
     }
 
-    public List<List<?>> findAllPostsWithPaging(int start, String keyword) {
+    public MyPageResponse findAllPostsWithPaging(int start, String keyword) {
         if (StringUtils.hasText(keyword)) {
             return findAllPostsByKeyword(keyword);
         }
@@ -70,10 +71,10 @@ public class PostService {
                 .map(PostResponse::fromPostDto)
                 .collect(Collectors.toList());
         List<Integer> pageList = Paging.getPageList(postRepository, PostType.POST, start);
-        return List.of(postList, pageList);
+        return MyPageResponse.of(postList, pageList);
     }
 
-    public List<List<?>> findAllPostsByKeyword(String keyword) {
+    public MyPageResponse findAllPostsByKeyword(String keyword) {
         if (!StringUtils.hasText(keyword)) {
             throw new OlaApplicationException(ErrorCode.INVALID_KEYWORD);
         }
@@ -83,7 +84,7 @@ public class PostService {
                 .orElseGet(List::of)
                 .stream().map(PostResponse::fromPostDto)
                 .collect(Collectors.toList());
-        return List.of(postList, List.of());
+        return MyPageResponse.of(postList, List.of());
     }
 
     // 없을 때에는 빈 list 반환
