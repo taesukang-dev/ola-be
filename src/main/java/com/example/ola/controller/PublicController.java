@@ -1,5 +1,6 @@
 package com.example.ola.controller;
 
+import com.example.ola.dto.response.MyPageResponse;
 import com.example.ola.dto.response.PostResponse;
 import com.example.ola.dto.response.Response;
 import com.example.ola.dto.response.TeamPostResponse;
@@ -20,14 +21,14 @@ public class PublicController {
     private final TeamPostService teamPostService;
 
     @GetMapping
-    public Response<List<List<?>>> postList(
+    public Response<MyPageResponse> postList(
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "") String keyword) {
         return Response.success(postService.findAllPostsWithPaging(page, keyword));
     }
 
     @GetMapping("/team")
-    public Response<List<List<?>>> teamPostList(
+    public Response<MyPageResponse> teamPostList(
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "") String keyword,
             @RequestParam(required = false, defaultValue = "") String place) {
