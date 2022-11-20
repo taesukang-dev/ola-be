@@ -1,17 +1,16 @@
 package com.example.ola.utils;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.io.Serializable;
 
 @Getter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MyPageableImpl implements MyPageable{
+public class MyPageableImpl {
     int page;
     int size;
 

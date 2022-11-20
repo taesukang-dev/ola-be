@@ -32,6 +32,7 @@ public class TeamPostService {
     private final UserRepository userRepository;
     private final AlarmRepository alarmRepository;
     private final AlarmService alarmService;
+    private static final int TEAM_POST_SIZE = 9;
 
     public TeamPostDto findTeamPostById(Long postId) {
         return TeamPostDto.fromPost(teamPostRepository.findTeamPostById(postId)
@@ -157,7 +158,7 @@ public class TeamPostService {
                 .stream().map(TeamPostDto::fromPost)
                 .map(TeamPostResponse::fromTeamPostDto)
                 .collect(Collectors.toList());
-        List<Integer> pageList = Paging.getPageList(teamPostRepository, PostType.TEAM_POST, start);
+        List<Integer> pageList = Paging.getPageList(teamPostRepository.getPostCount("T").intValue(), TEAM_POST_SIZE, start);
         return MyPageResponse.of(postList, pageList);
     }
 
