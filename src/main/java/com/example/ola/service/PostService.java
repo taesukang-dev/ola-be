@@ -30,6 +30,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final AlarmRepository alarmRepository;
+    private static final int POST_SIZE = 10;
 
     @Transactional
     public PostDto write(PostWriteRequest postWriteRequest, String userPrincipalUsername) {
@@ -70,7 +71,7 @@ public class PostService {
                 .stream().map(PostDto::fromPost)
                 .map(PostResponse::fromPostDto)
                 .collect(Collectors.toList());
-        List<Integer> pageList = Paging.getPageList(postRepository, PostType.POST, start);
+        List<Integer> pageList = Paging.getPageList(postRepository.getPostCount("post").intValue(), POST_SIZE, start);
         return MyPageResponse.of(postList, pageList);
     }
 
