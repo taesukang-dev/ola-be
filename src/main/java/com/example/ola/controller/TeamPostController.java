@@ -4,6 +4,7 @@ import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.dto.response.Response;
 import com.example.ola.dto.response.TeamPostResponse;
+import com.example.ola.dto.response.UserResponse;
 import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.service.PostService;
 import com.example.ola.service.TeamPostService;
@@ -50,11 +51,35 @@ public class TeamPostController {
         return Response.success();
     }
 
-    @PostMapping("/{postId}/member")
-    public Response<Void> addMember(
+    @GetMapping("/{postId}/wait")
+    public Response<List<UserResponse>> getWaitList(@PathVariable Long postId) {
+        return Response.success(teamPostService.getWaitLists(postId).stream().map(UserResponse::fromUserDto)
+                .collect(Collectors.toList()));
+    }
+
+    @PostMapping("/{postId}/wait")
+    public Response<Void> addWait(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        teamPostService.addMember(postId, userPrincipal.getUsername());
+        teamPostService.addWaitLists(postId, userPrincipal.getUsername());
+        return Response.success();
+    }
+
+    @DeleteMapping("/{postId}/wait/{memberId}")
+    public Response<Void> deleteWait(
+            @PathVariable Long postId,
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        teamPostService.removeWaitListMember(postId, memberId, userPrincipal.getUsername());
+        return Response.success();
+    }
+
+    @PostMapping("/{postId}/member/{memberId}")
+    public Response<Void> addMember(
+            @PathVariable Long postId,
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        teamPostService.addMember(postId, memberId, userPrincipal.getUsername());
         return Response.success();
     }
 
