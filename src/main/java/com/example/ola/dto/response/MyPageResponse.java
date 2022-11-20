@@ -1,7 +1,5 @@
 package com.example.ola.dto.response;
 
-import com.example.ola.utils.MyPage;
-
 import java.util.List;
 
 import lombok.Data;

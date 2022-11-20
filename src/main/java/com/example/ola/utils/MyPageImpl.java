@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MyPageImpl<T> implements MyPage{
+public class MyPageImpl<T>{
     T content;
     MyPageableImpl myPageable;
     int currentPage;
@@ -23,7 +23,6 @@ public class MyPageImpl<T> implements MyPage{
         return new MyPageImpl(content, myPageable, currentPage, totalElements);
     }
 
-    @Override
     public List<Integer> getPageList() {
         int totalPage = (int) Math.ceil((float) totalElements / myPageable.getSize());
 
