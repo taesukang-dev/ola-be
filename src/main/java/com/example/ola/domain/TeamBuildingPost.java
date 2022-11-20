@@ -9,7 +9,9 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -24,6 +26,9 @@ public class TeamBuildingPost extends Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TeamMemberWaitList> waitLists = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     TeamBuildingStatus teamBuildingStatus = TeamBuildingStatus.READY;
@@ -44,12 +49,6 @@ public class TeamBuildingPost extends Post {
         this.limits = limits;
     }
 
-
-    /**
-     * true : 꽉 참
-     * false : 자리 남음!
-     * @return
-     */
     public boolean checkLimits() {
         return limits <= members.size();
     }
