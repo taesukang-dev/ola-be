@@ -48,8 +48,7 @@ public class PostService {
 
     @Transactional
     public PostDto updatePost(PostUpdateRequest param, String userPrincipalUsername) {
-        Post foundedPost = postRepository.findById(param.getId())
-                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        Post foundedPost = getPostOrElseThrow(param.getId());
         if (!foundedPost.getUser().getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
@@ -58,8 +57,7 @@ public class PostService {
     }
 
     public PostDto findById(Long postId) {
-        return PostDto.fromPost(postRepository.findById(postId)
-                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND)));
+        return PostDto.fromPost(getPostOrElseThrow(postId));
     }
 
     public MyPageResponse findAllPostsWithPaging(int start, String keyword) {
@@ -98,13 +96,17 @@ public class PostService {
 
     @Transactional
     public void delete(Long postId, String userPrincipalUsername) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
+        Post post = getPostOrElseThrow(postId);
         if (!post.getUser().getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
         postRepository.remove(post);
         commentRepository.deleteByPostId(postId);
         alarmRepository.deleteByPostId(postId);
+    }
+
+    private Post getPostOrElseThrow(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND));
     }
 }
