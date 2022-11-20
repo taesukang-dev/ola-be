@@ -2,6 +2,7 @@ package com.example.ola.repository;
 
 import com.example.ola.domain.TeamBuildingPost;
 import com.example.ola.domain.TeamMember;
+import com.example.ola.domain.TeamMemberWaitList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -82,6 +83,23 @@ public class TeamPostRepository {
                 .setParameter("postId", postId)
                 .setParameter("userId", userId)
                 .getSingleResult();
+    }
+
+    public TeamMemberWaitList findWaitListMemberByPostIdAndUserId(Long postId, Long userId) {
+        return em.createQuery("select m from TeamMemberWaitList m" +
+                        " where m.post.id=:postId" +
+                        " and m.user.id=:userId" +
+                        " and m.deletedAt is null", TeamMemberWaitList.class)
+                .setParameter("postId", postId)
+                .setParameter("userId", userId)
+                .getSingleResult();
+    }
+
+    public Optional<List<TeamMemberWaitList>> findTeamMemberWaitListsById(Long postId) {
+        return Optional.ofNullable(em.createQuery("select w from TeamMemberWaitList w" +
+                        " where w.post.id=:postId")
+                .setParameter("postId", postId)
+                .getResultList());
     }
 
     public void remove(TeamBuildingPost post) {
