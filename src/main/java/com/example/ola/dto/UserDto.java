@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class UserDto {
     private Long id;
     private String username;
+    private String imgUri;
     private String password;
     private String nickname;
     private String name;
@@ -21,6 +22,6 @@ public class UserDto {
     private String gender;
 
     public static UserDto fromUser(User user) {
-        return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym(), user.getUserGender().getName());
+        return new UserDto(user.getId(), user.getUsername(), user.getImgUri(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym(), user.getUserGender().getName());
     }
 }

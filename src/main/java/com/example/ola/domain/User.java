@@ -19,6 +19,7 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+    private String imgUri;
     private String password;
     private String nickname;
     private String name;
@@ -30,14 +31,16 @@ public class User {
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
-    public void updateUser(String name, String nickname, String homeGym) {
+    public void updateUser(String name, String nickname, String homeGym, String imgUri) {
         this.name = name;
         this.nickname = nickname;
         this.homeGym = homeGym;
+        this.imgUri = imgUri;
     }
 
-    public User(String username, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
+    public User(String username, String imgUri, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
         this.username = username;
+        this.imgUri = imgUri;
         this.password = password;
         this.nickname = nickname;
         this.name = name;
@@ -50,8 +53,8 @@ public class User {
         }
     }
 
-    public static User of(String username, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
-        return new User(username, password, nickname, name, ageRange, homeGym, userGender);
+    public static User of(String username, String imgUri, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
+        return new User(username, imgUri, password, nickname, name, ageRange, homeGym, userGender);
     }
 
     @PrePersist void registeredAt() { this.registeredAt = Timestamp.from(Instant.now()); }

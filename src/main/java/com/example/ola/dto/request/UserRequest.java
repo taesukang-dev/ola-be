@@ -17,6 +17,7 @@ import javax.validation.constraints.Pattern;
 public class UserRequest {
     @NotBlank(message = "공백이어서는 안 됩니다.")
     private String username;
+    private String imgUri;
     @Pattern(regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$", message = "비밀번호는 최소 8자로 하나의 영어 소문자와 하나의 특수문자를 포함해야 합니다.")
     private String password;
     @NotBlank(message = "닉네임을 확인하세요.")
