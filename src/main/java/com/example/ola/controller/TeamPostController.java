@@ -51,12 +51,6 @@ public class TeamPostController {
         return Response.success();
     }
 
-    @GetMapping("/{postId}/wait")
-    public Response<List<UserResponse>> getWaitList(@PathVariable Long postId) {
-        return Response.success(teamPostService.getWaitLists(postId).stream().map(UserResponse::fromUserDto)
-                .collect(Collectors.toList()));
-    }
-
     @PostMapping("/{postId}/wait")
     public Response<Void> addWait(
             @PathVariable Long postId,
