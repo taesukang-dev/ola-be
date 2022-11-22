@@ -33,18 +33,18 @@ public class TeamBuildingPost extends Post {
     @Enumerated(EnumType.STRING)
     TeamBuildingStatus teamBuildingStatus = TeamBuildingStatus.READY;
 
-    public TeamBuildingPost(User user, String title, String content, String place, Long limits) {
-        super(user, title, content);
+    public TeamBuildingPost(User user, String title, String content, String imgUri, String place, Long limits) {
+        super(user, title, content, imgUri);
         this.place = place;
         this.limits = limits;
     }
 
-    public static TeamBuildingPost of(User user, String title, String content, String place, Long limits) {
-        return new TeamBuildingPost(user, title, content, place, limits);
+    public static TeamBuildingPost of(User user, String title, String content, String imgUri, String place, Long limits) {
+        return new TeamBuildingPost(user, title, content, imgUri, place, limits);
     }
 
-    public void update(String title, String content, String place, Long limits) {
-        this.update(title, content);
+    public void update(String title, String content, String imgUri, String place, Long limits) {
+        this.update(title, content, imgUri);
         this.place = place;
         this.limits = limits;
     }

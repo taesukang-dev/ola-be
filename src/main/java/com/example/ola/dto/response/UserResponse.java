@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
     private Long id;
     private String userId;
+    private String imgUri;
     private String nickname;
     private String name;
     private Long ageRange;
@@ -22,10 +23,10 @@ public class UserResponse {
     private String userGender;
 
     public static UserResponse fromUserDto(UserDto userDto) {
-        return new UserResponse(userDto.getId(), userDto.getUsername(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGym(), userDto.getGender());
+        return new UserResponse(userDto.getId(), userDto.getUsername(), userDto.getImgUri(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGym(), userDto.getGender());
     }
 
     public static UserResponse fromUserPrincipal(UserPrincipal userPrincipal) {
-        return new UserResponse(userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getNickname(), userPrincipal.getName(), userPrincipal.getAgeRange(), userPrincipal.getHomeGym(), userPrincipal.getUserGender());
+        return new UserResponse(userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getImgUri(), userPrincipal.getNickname(), userPrincipal.getName(), userPrincipal.getAgeRange(), userPrincipal.getHomeGym(), userPrincipal.getUserGender());
     }
 }

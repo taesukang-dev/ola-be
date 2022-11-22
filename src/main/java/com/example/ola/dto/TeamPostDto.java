@@ -19,6 +19,7 @@ public class TeamPostDto {
     private UserDto userDto;
     private String title;
     private String content;
+    private String imgUri;
     private String place;
     private Long limits;
     private List<UserDto> members;
@@ -31,6 +32,7 @@ public class TeamPostDto {
                 UserDto.fromUser(teamBuildingPost.getUser()),
                 teamBuildingPost.getTitle(),
                 teamBuildingPost.getContent(),
+                teamBuildingPost.getImgUri(),
                 teamBuildingPost.getPlace(),
                 teamBuildingPost.getLimits(),
                 teamBuildingPost.getMembers()

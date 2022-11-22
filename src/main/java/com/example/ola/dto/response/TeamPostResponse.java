@@ -20,6 +20,7 @@ public class TeamPostResponse {
     private UserResponse user;
     private String title;
     private String content;
+    private String imgUri;
     private String place;
     private Long limits;
     private List<UserResponse> member;
@@ -32,6 +33,7 @@ public class TeamPostResponse {
                 UserResponse.fromUserDto(teamBuildingPost.getUserDto()),
                 teamBuildingPost.getTitle(),
                 teamBuildingPost.getContent(),
+                teamBuildingPost.getImgUri(),
                 teamBuildingPost.getPlace(),
                 teamBuildingPost.getLimits(),
                 teamBuildingPost.getMembers()

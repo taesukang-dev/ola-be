@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 public class UserPrincipal implements UserDetails {
     private Long id;
     private String username;
+    private String imgUri;
     private String password;
     private String nickname;
     private String name;
@@ -38,6 +39,7 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(
                 user.getId(),
                 user.getUsername(),
+                user.getImgUri(),
                 user.getPassword(),
                 user.getNickname(),
                 user.getName(),

@@ -50,10 +50,10 @@ public class TeamPostService {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
         TeamBuildingPost post = TeamBuildingPost.of(
-                userRepository.findByUsername(teamPostWriteRequest.getUsername())
-                        .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
+                getUserByUsernameOrElseThrow(teamPostWriteRequest.getUsername()),
                 teamPostWriteRequest.getTitle(),
                 teamPostWriteRequest.getContent(),
+                teamPostWriteRequest.getImgUri(),
                 teamPostWriteRequest.getPlace(),
                 teamPostWriteRequest.getLimits());
         post.getMembers().add(TeamMember.of(post, post.getUser()));
@@ -66,7 +66,7 @@ public class TeamPostService {
         if (!foundedPost.getUser().getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        foundedPost.update(param.getTitle(), param.getContent(), param.getPlace(), param.getLimits());
+        foundedPost.update(param.getTitle(), param.getContent(), param.getImgUri(), param.getPlace(), param.getLimits());
         return TeamPostDto.fromPost(foundedPost);
     }
 

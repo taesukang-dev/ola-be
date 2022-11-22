@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserUpdateRequest {
     private String name;
+    private String imgUri;
     private String nickname;
     private String homeGym;
 }

@@ -15,4 +15,5 @@ public class TeamPostWriteRequest {
     private String username;
     private String place;
     private Long limits;
+    private String imgUri;
 }

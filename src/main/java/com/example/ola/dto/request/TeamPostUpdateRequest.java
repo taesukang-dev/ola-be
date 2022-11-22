@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class TeamPostUpdateRequest extends PostUpdateRequest{
     @Getter private String place;
     @Getter private Long limits;
+    private String imgUri;
 }

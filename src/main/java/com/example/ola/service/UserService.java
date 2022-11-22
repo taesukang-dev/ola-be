@@ -35,6 +35,7 @@ public class UserService {
                 userRepository.save(
                         User.of(
                                 userRequest.getUsername(),
+                                userRequest.getImgUri(),
                                 passwordEncoder.encode(userRequest.getPassword()),
                                 userRequest.getNickname(),
                                 userRequest.getName(),
@@ -55,7 +56,7 @@ public class UserService {
     public UserDto updateUser(String username, UserUpdateRequest updateParam) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
-        user.updateUser(updateParam.getName(), updateParam.getNickname(), updateParam.getHomeGym());
+        user.updateUser(updateParam.getName(), updateParam.getNickname(), updateParam.getHomeGym(), updateParam.getImgUri());
         return UserDto.fromUser(user);
     }
 
