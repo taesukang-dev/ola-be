@@ -17,6 +17,7 @@ public class PostResponse {
     private UserResponse user;
     private String title;
     private String content;
+    private String imgUri;
     private Timestamp registeredAt;
 
     public static PostResponse fromPostDto(PostDto post) {
@@ -25,6 +26,7 @@ public class PostResponse {
                 UserResponse.fromUserDto(post.getUserDto()),
                 post.getTitle(),
                 post.getContent(),
+                post.getImgUri(),
                 post.getRegisteredAt()
         );
     }

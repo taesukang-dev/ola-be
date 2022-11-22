@@ -26,7 +26,8 @@ public class Post {
     private User user;
     private String title;
     private String content;
-    // TODO : Image 추가할 것
+    private String imgUri;
+    
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
@@ -36,14 +37,27 @@ public class Post {
         this.title = title;
         this.content = content;
     }
+    
+    public Post (User user, String title, String content, String imgUri) {
+        this.user = user;
+        this.title = title;
+        this.content = content;
+        this.imgUri = imgUri;
+    }
 
-    public static Post of(User user, String title, String content) {
-        return new Post(user, title, content);
+    public static Post of(User user, String title, String content, String imgUri) {
+        return new Post(user, title, content, imgUri);
     }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void update(String title, String content, String imgUri) {
+        this.title = title;
+        this.content = content;
+        this.imgUri = imgUri;
     }
 
     @PrePersist void registeredAt() { this.registeredAt = Timestamp.from(Instant.now()); }

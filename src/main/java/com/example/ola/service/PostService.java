@@ -43,7 +43,8 @@ public class PostService {
                                 userRepository.findByUsername(postWriteRequest.getUsername())
                                         .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)),
                                 postWriteRequest.getTitle(),
-                                postWriteRequest.getContent())));
+                                postWriteRequest.getContent(),
+                                postWriteRequest.getImgUri())));
     }
 
     @Transactional
@@ -52,7 +53,7 @@ public class PostService {
         if (!foundedPost.getUser().getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        foundedPost.update(param.getTitle(), param.getContent());
+        foundedPost.update(param.getTitle(), param.getContent(), param.getImgUri());
         return PostDto.fromPost(foundedPost);
     }
 
