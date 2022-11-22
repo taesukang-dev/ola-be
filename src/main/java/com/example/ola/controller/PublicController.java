@@ -1,9 +1,6 @@
 package com.example.ola.controller;
 
-import com.example.ola.dto.response.MyPageResponse;
-import com.example.ola.dto.response.PostResponse;
-import com.example.ola.dto.response.Response;
-import com.example.ola.dto.response.TeamPostResponse;
+import com.example.ola.dto.response.*;
 import com.example.ola.service.PostService;
 import com.example.ola.service.TeamPostService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,4 +43,9 @@ public class PublicController {
         return Response.success(TeamPostResponse.fromTeamPostDto(teamPostService.findTeamPostById(postId)));
     }
 
+    @GetMapping("team/{postId}/wait")
+    public Response<List<UserResponse>> getWaitList(@PathVariable Long postId) {
+        return Response.success(teamPostService.getWaitLists(postId).stream().map(UserResponse::fromUserDto)
+                .collect(Collectors.toList()));
+    }
 }

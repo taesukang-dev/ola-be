@@ -13,4 +13,5 @@ public class PostUpdateRequest {
     private Long id;
     private String title;
     private String content;
+    private String imgUri;
 }

@@ -18,6 +18,7 @@ public class PostDto {
     private UserDto userDto;
     private String title;
     private String content;
+    private String imgUri;
     private Timestamp registeredAt;
 
     public static PostDto fromPost(Post post) {
@@ -26,6 +27,7 @@ public class PostDto {
                 UserDto.fromUser(post.getUser()),
                 post.getTitle(),
                 post.getContent(),
+                post.getImgUri(),
                 post.getRegisteredAt()
         );
     }
