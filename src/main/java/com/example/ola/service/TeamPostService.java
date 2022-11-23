@@ -36,6 +36,13 @@ public class TeamPostService {
     private final AlarmService alarmService;
     private static final int TEAM_POST_SIZE = 9;
 
+    public List<TeamPostDto> findTeamPostByLocation(Double x, Double y) {
+        return teamPostRepository.findPostsByShortestLocation(x, y)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
+                .stream().map(TeamPostDto::fromPost)
+                .collect(Collectors.toList());
+    }
+
     public TeamPostDto findTeamPostById(Long postId) {
         return TeamPostDto.fromPost(getTeamPostOrElseThrow(postId));
     }
