@@ -20,7 +20,7 @@ public class TeamPostDto {
     private String title;
     private String content;
     private String imgUri;
-    private String place;
+    private HomeGymDto homeGymDto;
     private Long limits;
     private List<UserDto> members;
     private Timestamp registeredAt;
@@ -33,7 +33,7 @@ public class TeamPostDto {
                 teamBuildingPost.getTitle(),
                 teamBuildingPost.getContent(),
                 teamBuildingPost.getImgUri(),
-                teamBuildingPost.getPlace(),
+                HomeGymDto.fromHomeGym(teamBuildingPost.getHomeGym()),
                 teamBuildingPost.getLimits(),
                 teamBuildingPost.getMembers()
                         .stream().map(e -> UserDto.fromUser(e.getUser()))

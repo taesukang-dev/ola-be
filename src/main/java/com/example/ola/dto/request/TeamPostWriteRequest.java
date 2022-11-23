@@ -13,7 +13,7 @@ public class TeamPostWriteRequest {
     private String title;
     private String content;
     private String username;
-    private String place;
+    private HomeGymRequest homeGymRequest;
     private Long limits;
     private String imgUri;
 }

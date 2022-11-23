@@ -21,7 +21,8 @@ import java.util.Set;
 @DiscriminatorValue("T")
 @Entity
 public class TeamBuildingPost extends Post {
-    private String place;
+    @ManyToOne(fetch = FetchType.LAZY)
+    HomeGym homeGym;
     private Long limits;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,19 +34,19 @@ public class TeamBuildingPost extends Post {
     @Enumerated(EnumType.STRING)
     TeamBuildingStatus teamBuildingStatus = TeamBuildingStatus.READY;
 
-    public TeamBuildingPost(User user, String title, String content, String imgUri, String place, Long limits) {
+    public TeamBuildingPost(User user, String title, String content, String imgUri, HomeGym homeGym, Long limits) {
         super(user, title, content, imgUri);
-        this.place = place;
+        this.homeGym = homeGym;
         this.limits = limits;
     }
 
-    public static TeamBuildingPost of(User user, String title, String content, String imgUri, String place, Long limits) {
-        return new TeamBuildingPost(user, title, content, imgUri, place, limits);
+    public static TeamBuildingPost of(User user, String title, String content, String imgUri, HomeGym homeGym, Long limits) {
+        return new TeamBuildingPost(user, title, content, imgUri, homeGym, limits);
     }
 
-    public void update(String title, String content, String imgUri, String place, Long limits) {
+    public void update(String title, String content, String imgUri, HomeGym homeGym, Long limits) {
         this.update(title, content, imgUri);
-        this.place = place;
+        this.homeGym = homeGym;
         this.limits = limits;
     }
 

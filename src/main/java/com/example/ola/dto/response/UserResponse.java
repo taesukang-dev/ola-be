@@ -1,5 +1,7 @@
 package com.example.ola.dto.response;
 
+import com.example.ola.domain.HomeGym;
+import com.example.ola.dto.HomeGymDto;
 import com.example.ola.dto.UserDto;
 
 import com.example.ola.dto.security.UserPrincipal;
@@ -19,11 +21,11 @@ public class UserResponse {
     private String nickname;
     private String name;
     private Long ageRange;
-    private String homeGym;
+    private HomeGymDto homeGym;
     private String userGender;
 
     public static UserResponse fromUserDto(UserDto userDto) {
-        return new UserResponse(userDto.getId(), userDto.getUsername(), userDto.getImgUri(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGym(), userDto.getGender());
+        return new UserResponse(userDto.getId(), userDto.getUsername(), userDto.getImgUri(), userDto.getNickname(), userDto.getName(), userDto.getAgeRange(), userDto.getHomeGymDto(), userDto.getGender());
     }
 
     public static UserResponse fromUserPrincipal(UserPrincipal userPrincipal) {

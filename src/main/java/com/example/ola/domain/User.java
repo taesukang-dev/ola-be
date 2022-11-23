@@ -24,21 +24,23 @@ public class User {
     private String nickname;
     private String name;
     private Long ageRange;
-    private String homeGym;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private HomeGym homeGym;
+
     @Enumerated(EnumType.STRING) private UserGender userGender;
     @Enumerated(EnumType.STRING) private UserRole role = UserRole.USER;
     @Column(name = "registered_at") private Timestamp registeredAt;
     @Column(name = "updated_at") private Timestamp updatedAt;
     @Column(name = "deleted_at") private Timestamp deletedAt;
 
-    public void updateUser(String name, String nickname, String homeGym, String imgUri) {
+    public void updateUser(String name, String nickname, HomeGym homeGym, String imgUri) {
         this.name = name;
         this.nickname = nickname;
         this.homeGym = homeGym;
         this.imgUri = imgUri;
     }
 
-    public User(String username, String imgUri, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
+    public User(String username, String imgUri, String password, String nickname, String name, Long ageRange, HomeGym homeGym, String userGender) {
         this.username = username;
         this.imgUri = imgUri;
         this.password = password;
@@ -53,7 +55,7 @@ public class User {
         }
     }
 
-    public static User of(String username, String imgUri, String password, String nickname, String name, Long ageRange, String homeGym, String userGender) {
+    public static User of(String username, String imgUri, String password, String nickname, String name, Long ageRange, HomeGym homeGym, String userGender) {
         return new User(username, imgUri, password, nickname, name, ageRange, homeGym, userGender);
     }
 

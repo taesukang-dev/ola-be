@@ -1,5 +1,6 @@
 package com.example.ola.dto;
 
+import com.example.ola.domain.HomeGym;
 import com.example.ola.domain.User;
 import lombok.Data;
 import lombok.Builder;
@@ -18,10 +19,19 @@ public class UserDto {
     private String nickname;
     private String name;
     private Long ageRange;
-    private String homeGym;
+    private HomeGymDto homeGymDto;
     private String gender;
 
     public static UserDto fromUser(User user) {
-        return new UserDto(user.getId(), user.getUsername(), user.getImgUri(), user.getPassword(), user.getNickname(), user.getName(), user.getAgeRange(), user.getHomeGym(), user.getUserGender().getName());
+        return new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getImgUri(),
+                user.getPassword(),
+                user.getNickname(),
+                user.getName(),
+                user.getAgeRange(),
+                HomeGymDto.fromHomeGym(user.getHomeGym()),
+                user.getUserGender().getName());
     }
 }

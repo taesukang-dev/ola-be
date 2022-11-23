@@ -1,7 +1,9 @@
 package com.example.ola.dto.security;
 
+import com.example.ola.domain.HomeGym;
 import com.example.ola.domain.User;
 import com.example.ola.domain.UserRole;
+import com.example.ola.dto.HomeGymDto;
 import com.example.ola.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,7 +32,7 @@ public class UserPrincipal implements UserDetails {
     private String nickname;
     private String name;
     private Long ageRange;
-    private String homeGym;
+    private HomeGymDto homeGym;
     private String userGender;
     Collection<? extends GrantedAuthority> authorities;
 
@@ -44,7 +46,7 @@ public class UserPrincipal implements UserDetails {
                 user.getNickname(),
                 user.getName(),
                 user.getAgeRange(),
-                user.getHomeGym(),
+                HomeGymDto.fromHomeGym(user.getHomeGym()),
                 user.getUserGender().getName(),
                 roles.stream().map(UserRole::getName).map(SimpleGrantedAuthority::new).collect(Collectors.toUnmodifiableSet())
         );

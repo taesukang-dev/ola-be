@@ -1,5 +1,6 @@
 package com.example.ola.dto.request;
 
+import com.example.ola.domain.HomeGym;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeamPostUpdateRequest extends PostUpdateRequest{
-    @Getter private String place;
-    @Getter private Long limits;
+    private HomeGymRequest homeGymRequest;
+    private Long limits;
     private String imgUri;
 }

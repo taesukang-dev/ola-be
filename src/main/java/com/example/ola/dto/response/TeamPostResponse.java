@@ -1,6 +1,7 @@
 package com.example.ola.dto.response;
 
 import com.example.ola.domain.TeamBuildingStatus;
+import com.example.ola.dto.HomeGymDto;
 import com.example.ola.dto.TeamPostDto;
 import lombok.Data;
 import lombok.Builder;
@@ -21,7 +22,7 @@ public class TeamPostResponse {
     private String title;
     private String content;
     private String imgUri;
-    private String place;
+    private HomeGymDto place;
     private Long limits;
     private List<UserResponse> member;
     private Timestamp registeredAt;
@@ -34,7 +35,7 @@ public class TeamPostResponse {
                 teamBuildingPost.getTitle(),
                 teamBuildingPost.getContent(),
                 teamBuildingPost.getImgUri(),
-                teamBuildingPost.getPlace(),
+                teamBuildingPost.getHomeGymDto(),
                 teamBuildingPost.getLimits(),
                 teamBuildingPost.getMembers()
                         .stream().map(UserResponse::fromUserDto)

@@ -25,7 +25,7 @@ public class UserRequest {
     @NotBlank(message = "이름을 확인하세요.")
     private String name;
     private Long ageRange;
-    private String homeGym;
+    private HomeGymRequest homeGymRequest;
     private String gender;
 }
 
