@@ -1,5 +1,6 @@
 package com.example.ola.controller;
 
+import com.example.ola.dto.request.TeamPostByLocationRequest;
 import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.dto.response.Response;
@@ -21,6 +22,14 @@ import java.util.stream.Collectors;
 public class TeamPostController {
 
     private final TeamPostService teamPostService;
+
+    @PostMapping("/location")
+    public Response<List<TeamPostResponse>> getPostsByLocation(
+            @RequestBody TeamPostByLocationRequest teamPostByLocationRequest) {
+        return Response.success(teamPostService.findTeamPostByLocation(teamPostByLocationRequest.getX(), teamPostByLocationRequest.getY())
+                .stream().map(TeamPostResponse::fromTeamPostDto)
+                .collect(Collectors.toList()));
+    }
 
     @GetMapping
     public Response<List<TeamPostResponse>> getMyTeamPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {

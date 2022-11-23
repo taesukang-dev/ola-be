@@ -27,6 +27,7 @@ public class TeamPostRepository {
         return Optional.ofNullable(
                 em.createQuery("select p from TeamBuildingPost p" +
                                 " join fetch p.user" +
+                                " join fetch p.homeGym" +
                                 " join fetch p.members" +
                                 " where p.id =:postId", TeamBuildingPost.class)
                         .setParameter("postId", postId)
@@ -37,6 +38,7 @@ public class TeamPostRepository {
     public Optional<List<TeamBuildingPost>> findAllTeamPostsWithPaging(int start) {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
+                        " join fetch p.homeGym" +
                         " order by p.id desc", TeamBuildingPost.class)
                 .setFirstResult(start * 9)
                 .setMaxResults(9)
@@ -46,6 +48,7 @@ public class TeamPostRepository {
     public Optional<List<TeamBuildingPost>> findAllTeamPostsByKeyword(String keyword) {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
+                        " join fetch p.homeGym" +
                         " where p.title like :keyword" +
                         " order by p.id desc", TeamBuildingPost.class)
                 .setParameter("keyword", "%" + keyword + "%")
@@ -56,6 +59,7 @@ public class TeamPostRepository {
     public Optional<List<TeamBuildingPost>> findAllTeamPostsByPlace(String place) {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
+                        " join fetch p.homeGym" +
                         " where p.place like :place" +
                         " order by p.id desc", TeamBuildingPost.class)
                 .setParameter("place", "%" + place + "%")
@@ -78,6 +82,7 @@ public class TeamPostRepository {
     public TeamMember findTeamMemberByPostIdAndUserId(Long postId, Long userId) {
         return em.createQuery("select m from TeamMember m" +
                         " where m.post.id=:postId" +
+                        " where m.post.id=:postId" +
                         " and m.user.id=:userId" +
                         " and m.deletedAt is null", TeamMember.class)
                 .setParameter("postId", postId)
@@ -99,6 +104,16 @@ public class TeamPostRepository {
         return Optional.ofNullable(em.createQuery("select w from TeamMemberWaitList w" +
                         " where w.post.id=:postId")
                 .setParameter("postId", postId)
+                .getResultList());
+    }
+
+    public Optional<List<TeamBuildingPost>> findPostsByShortestLocation(Double x, Double y) {
+        return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost  p" +
+                        " inner join HomeGym h" +
+                        " on p.homeGym.id = h.id" +
+                        " order by abs(h.x - :x) + abs(h.y - :y)")
+                .setParameter("x", x)
+                .setParameter("y", y)
                 .getResultList());
     }
 
