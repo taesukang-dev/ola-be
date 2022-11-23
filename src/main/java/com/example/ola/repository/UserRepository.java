@@ -20,7 +20,9 @@ public class UserRepository {
     }
 
     public Optional<User> findByUsername(String username) {
-        return em.createQuery("select u from User u where u.username=:username", User.class)
+        return em.createQuery("select u from User u" +
+                        " join fetch u.homeGym" +
+                        " where u.username=:username", User.class)
                 .setParameter("username", username)
                 .getResultList()
                 .stream().findFirst();
