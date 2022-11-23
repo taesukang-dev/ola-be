@@ -3,6 +3,7 @@ package com.example.ola.service;
 import com.example.ola.domain.*;
 import com.example.ola.dto.TeamPostDto;
 import com.example.ola.dto.UserDto;
+import com.example.ola.dto.request.HomeGymRequest;
 import com.example.ola.dto.request.TeamPostUpdateRequest;
 import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.dto.response.MyPageResponse;
@@ -10,6 +11,7 @@ import com.example.ola.dto.response.TeamPostResponse;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.repository.AlarmRepository;
+import com.example.ola.repository.HomeGymRepository;
 import com.example.ola.repository.TeamPostRepository;
 import com.example.ola.repository.UserRepository;
 import com.example.ola.utils.Paging;
@@ -30,6 +32,7 @@ public class TeamPostService {
     private final TeamPostRepository teamPostRepository;
     private final UserRepository userRepository;
     private final AlarmRepository alarmRepository;
+    private final HomeGymRepository homeGymRepository;
     private final AlarmService alarmService;
     private static final int TEAM_POST_SIZE = 9;
 
@@ -54,7 +57,7 @@ public class TeamPostService {
                 teamPostWriteRequest.getTitle(),
                 teamPostWriteRequest.getContent(),
                 teamPostWriteRequest.getImgUri(),
-                teamPostWriteRequest.getPlace(),
+                checkDuplicateHomeGymAndGetHomeGym(teamPostWriteRequest.getHomeGymRequest()),
                 teamPostWriteRequest.getLimits());
         post.getMembers().add(TeamMember.of(post, post.getUser()));
         return TeamPostDto.fromPost(teamPostRepository.saveTeamPost(post));
@@ -66,8 +69,28 @@ public class TeamPostService {
         if (!foundedPost.getUser().getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
-        foundedPost.update(param.getTitle(), param.getContent(), param.getImgUri(), param.getPlace(), param.getLimits());
+        foundedPost.update(param.getTitle(), param.getContent(), param.getImgUri(), checkDuplicateHomeGymAndGetHomeGym(param.getHomeGymRequest()), param.getLimits());
         return TeamPostDto.fromPost(foundedPost);
+    }
+
+    private HomeGym checkDuplicateHomeGymAndGetHomeGym(HomeGymRequest updateParam) {
+        HomeGym homeGym = homeGymRepository.findByPlaceName(updateParam.getPlaceName())
+                .orElseGet(() -> saveAndReturnHomeGym(updateParam));
+        // 사명은 같아도 주소가 다른 경우
+        if (!homeGym.getRoadAddressName().equals(updateParam.getRoadAddressName())) {
+            homeGym = saveAndReturnHomeGym(updateParam);
+        }
+        return homeGym;
+    }
+
+    private HomeGym saveAndReturnHomeGym(HomeGymRequest homeGymRequest) {
+        return homeGymRepository.save(
+                HomeGym.of(
+                        homeGymRequest.getPlaceName(),
+                        homeGymRequest.getRoadAddressName(),
+                        homeGymRequest.getCategoryName(),
+                        homeGymRequest.getX(),
+                        homeGymRequest.getY()));
     }
 
     @Transactional
