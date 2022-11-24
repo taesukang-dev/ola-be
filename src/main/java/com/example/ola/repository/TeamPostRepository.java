@@ -35,6 +35,18 @@ public class TeamPostRepository {
         );
     }
 
+    public Optional<List<TeamBuildingPost>> findPostsByShortestLocation(Double x, Double y, int start) {
+        return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost  p" +
+                        " inner join HomeGym h" +
+                        " on p.homeGym.id = h.id" +
+                        " order by abs(h.x - :x) + abs(h.y - :y)")
+                .setParameter("x", x)
+                .setParameter("y", y)
+                .setFirstResult(start * 9)
+                .setMaxResults(9)
+                .getResultList());
+    }
+
     public Optional<List<TeamBuildingPost>> findAllTeamPostsWithPaging(int start) {
         return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost p" +
                         " join fetch p.user" +
@@ -43,6 +55,7 @@ public class TeamPostRepository {
                 .setFirstResult(start * 9)
                 .setMaxResults(9)
                 .getResultList());
+
     }
 
     public Optional<List<TeamBuildingPost>> findAllTeamPostsByKeyword(String keyword) {
@@ -52,7 +65,7 @@ public class TeamPostRepository {
                         " where p.title like :keyword" +
                         " order by p.id desc", TeamBuildingPost.class)
                 .setParameter("keyword", "%" + keyword + "%")
-                .setMaxResults(10)
+                .setMaxResults(9)
                 .getResultList());
     }
 
@@ -63,7 +76,7 @@ public class TeamPostRepository {
                         " where p.place like :place" +
                         " order by p.id desc", TeamBuildingPost.class)
                 .setParameter("place", "%" + place + "%")
-                .setMaxResults(10)
+                .setMaxResults(9)
                 .getResultList());
     }
 
@@ -76,6 +89,7 @@ public class TeamPostRepository {
                                         " and t.deletedAt is null)"
                                 , TeamBuildingPost.class)
                         .setParameter("username", username)
+                        .setMaxResults(9)
                         .getResultList());
     }
 
@@ -104,16 +118,6 @@ public class TeamPostRepository {
         return Optional.ofNullable(em.createQuery("select w from TeamMemberWaitList w" +
                         " where w.post.id=:postId")
                 .setParameter("postId", postId)
-                .getResultList());
-    }
-
-    public Optional<List<TeamBuildingPost>> findPostsByShortestLocation(Double x, Double y) {
-        return Optional.ofNullable(em.createQuery("select p from TeamBuildingPost  p" +
-                        " inner join HomeGym h" +
-                        " on p.homeGym.id = h.id" +
-                        " order by abs(h.x - :x) + abs(h.y - :y)")
-                .setParameter("x", x)
-                .setParameter("y", y)
                 .getResultList());
     }
 
