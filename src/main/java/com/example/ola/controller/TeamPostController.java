@@ -25,8 +25,9 @@ public class TeamPostController {
 
     @PostMapping("/location")
     public Response<List<TeamPostResponse>> getPostsByLocation(
-            @RequestBody TeamPostByLocationRequest teamPostByLocationRequest) {
-        return Response.success(teamPostService.findTeamPostByLocation(teamPostByLocationRequest.getX(), teamPostByLocationRequest.getY())
+            @RequestBody TeamPostByLocationRequest teamPostByLocationRequest,
+            @RequestParam int page) {
+        return Response.success(teamPostService.findTeamPostByLocation(teamPostByLocationRequest.getX(), teamPostByLocationRequest.getY(), page)
                 .stream().map(TeamPostResponse::fromTeamPostDto)
                 .collect(Collectors.toList()));
     }
