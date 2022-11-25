@@ -1,13 +1,14 @@
 package com.example.ola.controller;
 
-import com.example.ola.dto.PostDto;
-import com.example.ola.dto.request.PostUpdateRequest;
-import com.example.ola.dto.request.PostWriteRequest;
+import com.example.ola.dto.TeamPostDto;
+import com.example.ola.dto.request.HomeGymRequest;
+import com.example.ola.dto.request.TeamPostUpdateRequest;
+import com.example.ola.dto.request.TeamPostWriteRequest;
 import com.example.ola.dto.response.MyPageResponse;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.fixture.Fixture;
-import com.example.ola.service.PostService;
+import com.example.ola.service.TeamPostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,37 +21,39 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-class PostControllerTest {
-    @Autowired private MockMvc mockMvc;
+class TeamPostControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
 
-    @MockBean private PostService postService;
+    @MockBean
+    private TeamPostService teamPostService;
 
     @Test
-    void 일반_게시글_목록_조회() throws Exception {
+    void 팀빌딩_게시글_목록_조회() throws Exception {
         // given
-        when(postService.findAllPostsWithPaging(anyInt(), eq(""))).thenReturn(mock(MyPageResponse.class));
+        when(teamPostService.findAllTeamPostsWithPaging(0, "", "")).thenReturn(mock(MyPageResponse.class));
         // when then
-        mockMvc.perform(get("/api/v2/posts")
+        mockMvc.perform(get("/api/v2/posts/team")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
-    void 일반_게시글_단건_조회() throws Exception {
+    void 팀빌딩_게시글_단건_조회() throws Exception {
         // given
-        when(postService.findById(any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("user1", "title1")));
+        when(teamPostService.findTeamPostById(any())).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1")));
         // when then
-        mockMvc.perform(get("/api/v2/posts/1")
+        mockMvc.perform(get("/api/v2/posts/team/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -58,18 +61,12 @@ class PostControllerTest {
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void 일반_게시물_작성() throws Exception {
+    void 팀빌딩_게시물_작성() throws Exception {
         // given
-        PostWriteRequest param = PostWriteRequest.builder()
-                .title("title")
-                .content("content")
-                .username("test1")
-                .imgUri("img")
-                .build();
-        when(postService.write(any(), eq("test1")))
-                .thenReturn(PostDto.fromPost(Fixture.makePostFixture("test1", "title1")));
+        TeamPostWriteRequest param = Fixture.makeTeamPostWriteRequest("test1", "title1");
+        when(teamPostService.writeTeamPost(any(), eq("test1"))).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1")));
         // when then
-        mockMvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -78,16 +75,11 @@ class PostControllerTest {
 
     @WithAnonymousUser
     @Test
-    void 일반_게시물_작성시_로그인하지_않은_경우() throws Exception {
+    void 팀빌딩_게시물_작성시_로그인하지_않은_경우() throws Exception {
         // given
-        PostWriteRequest param = PostWriteRequest.builder()
-                .title("title")
-                .content("content")
-                .username("test1")
-                .imgUri("img")
-                .build();
+        TeamPostWriteRequest param = Fixture.makeTeamPostWriteRequest("test1", "title1");
         // when then
-        mockMvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -96,29 +88,33 @@ class PostControllerTest {
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void 일반_게시물_수정() throws Exception {
+    void 팀빌딩_게시물_수정() throws Exception {
         // given
-        PostUpdateRequest param = new PostUpdateRequest(1L, "updated", "updated", "testImg");
+        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "img",
+                new HomeGymRequest("place", "address", "category", 3.14, 3.14),
+                5L);
 
-        when(postService.updatePost(any(), any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1")));
+        when(teamPostService.updateTeamPost(any(), any())).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title")));
         // when then
-        mockMvc.perform(put("/api/v1/posts")
+        mockMvc.perform(put("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(param)))
-                .andDo(print())
+                        .content(objectMapper.writeValueAsBytes(param))
+                ).andDo(print())
                 .andExpect(status().isOk());
     }
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void 일반_게시물_수정시_자신의_게시글이_아닌경우() throws Exception {
+    void 팀빌딩_게시물_수정시_자신의_게시글이_아닌경우() throws Exception {
         // given
-        PostUpdateRequest param = new PostUpdateRequest(1L, "updated", "updated", "testImg");
+        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "img",
+                new HomeGymRequest("place", "address", "category", 3.14, 3.14),
+                5L);
 
         doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
-                .when(postService).updatePost(any(), any());
+                .when(teamPostService).updateTeamPost(any(), any());
         // when then
-        mockMvc.perform(put("/api/v1/posts")
+        mockMvc.perform(put("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -127,14 +123,15 @@ class PostControllerTest {
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void 일반_게시물_수정시_게시글이_없는경우() throws Exception {
+    void 팀빌딩_게시물_수정시_게시글이_없는경우() throws Exception {
         // given
-        PostUpdateRequest param = new PostUpdateRequest(1L, "updated", "updated", "testImg");
-
+        TeamPostUpdateRequest param = new TeamPostUpdateRequest(1L, "title", "content", "img",
+                new HomeGymRequest("place", "address", "category", 3.14, 3.14),
+                5L);
         doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
-                .when(postService).updatePost(any(), any());
+                .when(teamPostService).updateTeamPost(any(), any());
         // when then
-        mockMvc.perform(put("/api/v1/posts")
+        mockMvc.perform(put("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -143,29 +140,28 @@ class PostControllerTest {
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void 일반_게시물_삭제() throws Exception {
-        mockMvc.perform(delete("/api/v1/posts/1"))
+    void 팀빌딩_게시물_삭제() throws Exception {
+        mockMvc.perform(delete("/api/v1/posts/team/1"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @WithAnonymousUser
     @Test
-    void 일반_게시물_삭제시_로그인하지_않은_경우() throws Exception {
-        mockMvc.perform(delete("/api/v1/posts/1"))
+    void 팀빌딩_게시물_삭제시_로그인하지_않은_경우() throws Exception {
+        mockMvc.perform(delete("/api/v1/posts/team/1"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
     @WithAnonymousUser
     @Test
-    void 일반_게시물_삭제시_작성자와_다른_경우() throws Exception {
+    void 팀빌딩_게시물_삭제시_작성자와_다른_경우() throws Exception {
         doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
-                .when(postService).delete(any(), any());
-        mockMvc.perform(delete("/api/v1/posts/1"))
+                .when(teamPostService).removeTeamPost(any(), any());
+        mockMvc.perform(delete("/api/v1/posts/team/1"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
-
 
 }
