@@ -15,5 +15,10 @@ import lombok.NoArgsConstructor;
 public class TeamPostUpdateRequest extends PostUpdateRequest{
     private HomeGymRequest homeGymRequest;
     private Long limits;
-    private String imgUri;
+
+    public TeamPostUpdateRequest(Long id, String title, String content, String imgUri, HomeGymRequest homeGymRequest, Long limits) {
+        super(id, title, content, imgUri);
+        this.homeGymRequest = homeGymRequest;
+        this.limits = limits;
+    }
 }

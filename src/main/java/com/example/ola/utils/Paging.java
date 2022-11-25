@@ -6,6 +6,10 @@ import java.util.stream.IntStream;
 
 public class Paging {
     private final static int PAGE_LIST_NUM = 5;
+
+    private Paging() {
+    }
+
     public static List<Integer> getPageList(int elementCount, int postSize, Integer currentPage) {
         int total = (int) Math.ceil((float) elementCount / postSize);
         int startNumber = Math.max(currentPage - (PAGE_LIST_NUM / 2), 0);

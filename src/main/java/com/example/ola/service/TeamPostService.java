@@ -73,7 +73,7 @@ public class TeamPostService {
     @Transactional
     public TeamPostDto updateTeamPost(TeamPostUpdateRequest param, String userPrincipalUsername) {
         TeamBuildingPost foundedPost = getTeamPostOrElseThrow(param.getId());
-        if (!foundedPost.getUser().getUsername().equals(userPrincipalUsername)) {
+        if (!getUserByUsernameOrElseThrow(foundedPost.getUser().getUsername()).getUsername().equals(userPrincipalUsername)) {
             throw new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR);
         }
         foundedPost.update(param.getTitle(), param.getContent(), param.getImgUri(), checkDuplicateHomeGymAndGetHomeGym(param.getHomeGymRequest()), param.getLimits());
