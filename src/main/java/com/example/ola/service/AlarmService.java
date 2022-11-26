@@ -27,6 +27,11 @@ public class AlarmService {
     private final static Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
     private final static String ALARM_NAME = "alarm";
 
+    /**
+     * SseEmitter 를 통한 알람 전송
+     * @param alarmId
+     * @param userId
+     */
     public void send(Long alarmId, Long userId) {
         emitterRepository.get(userId).ifPresentOrElse(sseEmitter -> {
             try {
@@ -38,6 +43,11 @@ public class AlarmService {
         }, () -> log.info("No Emiiter found"));
     }
 
+    /**
+     * SseEmitter 연결 : userId를 key 로 연결
+     * @param userId
+     * @return sseEmitter
+     */
     public SseEmitter connectAlarm(Long userId) {
         SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitterRepository.save(userId, sseEmitter);
@@ -52,6 +62,11 @@ public class AlarmService {
         return sseEmitter;
     }
 
+    /**
+     * 알람 조회
+     * @param username
+     * @return List<AlarmDto>
+     */
     @Transactional
     public List<AlarmDto> alarms(String username) {
         return alarmRepository.findByUsername(username)
@@ -59,6 +74,10 @@ public class AlarmService {
                         .collect(Collectors.toList())).orElseGet(List::of);
     }
 
+    /**
+     * 알람 삭제
+     * @param alarmId
+     */
     @Transactional
     public void deleteAlarm(Long alarmId) {
         Alarm alarm = alarmRepository.findById(alarmId)
