@@ -30,6 +30,11 @@ public class UserService {
     private final HomeGymRepository homeGymRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * 회원가입
+     * @param userRequest
+     * @return UserDto
+     */
     @Transactional
     public UserDto join(UserRequest userRequest) {
         userRepository.findByUsername(userRequest.getUsername()).ifPresent(it -> {
@@ -48,19 +53,28 @@ public class UserService {
                                 userRequest.getGender())));
     }
 
+    /**
+     * 유저 정보 수정
+     * @param username
+     * @param updateParam
+     * @return UserDto
+     */
     @Transactional
     public UserDto updateUser(String username, UserUpdateRequest updateParam) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = getUserByUsernameOrElseThrow(username);
         user.updateUser(updateParam.getName(), updateParam.getNickname(), checkDuplicateHomeGymAndGetHomeGym(updateParam.getHomeGymRequest()), updateParam.getImgUri());
         return UserDto.fromUser(user);
     }
 
+    /**
+     * DB에 같은 사명으로 튜플이 존재하면 해당 튜플 반환, 아니면 새로 저장한다.
+     * @param updateParam
+     * @return HomeGym
+     */
     private HomeGym checkDuplicateHomeGymAndGetHomeGym(HomeGymRequest updateParam) {
         HomeGym homeGym = homeGymRepository.findByPlaceName(updateParam.getPlaceName())
                 .orElseGet(() -> saveAndReturnHomeGym(updateParam));
-        // 사명은 같아도 주소가 다른 경우
-        if (!homeGym.getRoadAddressName().equals(updateParam.getRoadAddressName())) {
+        if (!homeGym.getRoadAddressName().equals(updateParam.getRoadAddressName())) { // 사명은 같아도 주소가 다른 경우 저장
             homeGym = saveAndReturnHomeGym(updateParam);
         }
         return homeGym;
@@ -76,8 +90,14 @@ public class UserService {
                         homeGymRequest.getY()));
     }
 
+    /**
+     * 로그인 jwt 토큰 반환
+     * @param username
+     * @param password
+     * @return String
+     */
     public String login(String username, String password) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = getUserByUsernameOrElseThrow(username);
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new OlaApplicationException(ErrorCode.INVALID_PASSWORD);
         }
@@ -85,6 +105,11 @@ public class UserService {
     }
 
     public UserDto findByUsername(String username) {
-        return UserDto.fromUser(userRepository.findByUsername(username).orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND)));
+        return UserDto.fromUser(getUserByUsernameOrElseThrow(username));
+    }
+
+    private User getUserByUsernameOrElseThrow(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new OlaApplicationException(ErrorCode.USER_NOT_FOUND));
     }
 }
