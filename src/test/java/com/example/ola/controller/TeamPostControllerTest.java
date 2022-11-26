@@ -51,7 +51,7 @@ class TeamPostControllerTest {
     @Test
     void 팀빌딩_게시글_단건_조회() throws Exception {
         // given
-        when(teamPostService.findTeamPostById(any())).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1")));
+        when(teamPostService.findTeamPostById(any())).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1", 3.14, 3.14)));
         // when then
         mockMvc.perform(get("/api/v2/posts/team/1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -64,7 +64,7 @@ class TeamPostControllerTest {
     void 팀빌딩_게시물_작성() throws Exception {
         // given
         TeamPostWriteRequest param = Fixture.makeTeamPostWriteRequest("test1", "title1");
-        when(teamPostService.writeTeamPost(any(), eq("test1"))).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1")));
+        when(teamPostService.writeTeamPost(any(), eq("test1"))).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1", 3.14, 3.14)));
         // when then
         mockMvc.perform(post("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +94,7 @@ class TeamPostControllerTest {
                 new HomeGymRequest("place", "address", "category", 3.14, 3.14),
                 5L);
 
-        when(teamPostService.updateTeamPost(any(), any())).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title")));
+        when(teamPostService.updateTeamPost(any(), any())).thenReturn(TeamPostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title", 3.14, 3.14)));
         // when then
         mockMvc.perform(put("/api/v1/posts/team")
                         .contentType(MediaType.APPLICATION_JSON)
