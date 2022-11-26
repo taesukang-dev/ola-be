@@ -48,7 +48,7 @@ class PostControllerTest {
     @Test
     void 일반_게시글_단건_조회() throws Exception {
         // given
-        when(postService.findById(any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("user1", "title1")));
+        when(postService.findById(any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("user1", "title1", 3.14, 3.14)));
         // when then
         mockMvc.perform(get("/api/v2/posts/1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -100,7 +100,7 @@ class PostControllerTest {
         // given
         PostUpdateRequest param = new PostUpdateRequest(1L, "updated", "updated", "testImg");
 
-        when(postService.updatePost(any(), any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1")));
+        when(postService.updatePost(any(), any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1", 3.14, 3.14)));
         // when then
         mockMvc.perform(put("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)

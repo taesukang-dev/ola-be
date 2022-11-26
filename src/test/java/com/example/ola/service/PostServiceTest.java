@@ -110,6 +110,72 @@ class PostServiceTest {
     }
 
     @Test
+    void 제목_검색_게시물_페이징_조회() throws Exception {
+        // given
+        List<Post> temp = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Post post = Fixture.makePostFixture("user" + i, "title" + i);
+            temp.add(post);
+        }
+        when(postRepository.findAllPostsByKeyword(any())).thenReturn(Optional.of(temp));
+        when(postRepository.getPostCount(eq("post"))).thenReturn(1L);
+
+        // when
+        MyPageResponse allPostsWithPaging = postService.findAllPostsWithPaging(0, "title");
+        List<PostResponse> contents = (List<PostResponse>) allPostsWithPaging.getContents();
+        List<Integer> pageList = allPostsWithPaging.getPageList();
+        // then
+        assertThat(contents.size()).isEqualTo(10);
+        assertThat(pageList.size()).isEqualTo(0);
+    }
+
+    @Test
+    void 내가쓴_게시물_조회() throws Exception {
+        // given
+        List<Post> temp = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Post post = Fixture.makePostFixture("user", "title" + i);
+            temp.add(post);
+        }
+        when(postRepository.findPostsByUsername("user")).thenReturn(Optional.of(temp));
+        // when
+        List<PostDto> postDtoList = postService.findPostsByUsername("user");
+        // then
+        assertThat(postDtoList.size()).isEqualTo(10);
+    }
+
+    @Test
+    void 내가쓴_게시물이_없는경우() throws Exception {
+        // given
+        List<Post> temp = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Post post = Fixture.makePostFixture("user", "title" + i);
+            temp.add(post);
+        }
+        when(postRepository.findPostsByUsername("user")).thenReturn(Optional.of(temp));
+        // when
+        List<PostDto> postDtoList = postService.findPostsByUsername("user1");
+        // then
+        assertThat(postDtoList.size()).isEqualTo(0);
+    }
+
+    @Test
+    void 제목_검색_게시물_페이징_조회시_검색어가_없는_경우() throws Exception {
+        // given
+        List<Post> temp = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Post post = Fixture.makePostFixture("user" + i, "title" + i);
+            temp.add(post);
+        }
+        // when
+        when(postRepository.findAllPostsByKeyword(any())).thenReturn(Optional.of(temp));
+        when(postRepository.getPostCount(eq("post"))).thenReturn(1L);
+        // then
+        assertThatThrownBy(() -> postService.findAllPostsByKeyword(""))
+                .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
     void 일반게시물_수정() throws Exception {
         // given
         Post post = Fixture.makePostFixture("user1", "title1");
@@ -179,6 +245,4 @@ class PostServiceTest {
         assertThatThrownBy(() -> postService.delete(1L, "asd"))
                 .isInstanceOf(OlaApplicationException.class);
     }
-
-
 }
