@@ -1,5 +1,6 @@
 package com.example.ola.service;
 
+import com.example.ola.domain.Alarm;
 import com.example.ola.domain.Comment;
 import com.example.ola.domain.Post;
 import com.example.ola.domain.User;
@@ -7,6 +8,7 @@ import com.example.ola.dto.CommentDto;
 import com.example.ola.dto.request.PostType;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.fixture.Fixture;
+import com.example.ola.repository.AlarmRepository;
 import com.example.ola.repository.CommentRepository;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
@@ -26,7 +28,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -40,7 +41,12 @@ class CommentServiceTest {
     @MockBean
     UserRepository userRepository;
     @MockBean
+    AlarmRepository alarmRepository;
+    @MockBean
     CommentRepository commentRepository;
+    @MockBean
+    AlarmService alarmService;
+
     private static MockedStatic<Paging> paging;
 
     @Test
@@ -65,26 +71,46 @@ class CommentServiceTest {
         assertThat(commentDtos.get(9).getContent()).isEqualTo("content9");
     }
 
-
     @Test
     void 댓글_작성() throws Exception {
         // given
         Post post = Fixture.makePostFixture("user1", "title1");
+        Alarm alarm = Fixture.makeAlarmFixture(post.getUser().getUsername(), "name", post.getId());
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(post.getUser()));
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
-        when(commentRepository.findById(any())).thenReturn(Optional.of(Fixture.commentFixture(post)));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(Fixture.makeCommentFixture(post)));
+        when(alarmRepository.save(any())).thenReturn(alarm);
         doNothing().when(commentRepository).save(any());
         // when
-        commentService.writeComment(1L, "name", "content", PostType.POST);
-        commentService.writeComment(1L, 1L, "name", "content", PostType.POST);
+        commentService.writeComment(post.getId(), "name", "content", PostType.POST);
+        commentService.writeComment(post.getId(), 1L, "name", "content", PostType.POST);
         // then
-        assertThatNoException();
+        verify(alarmRepository, times(2)).save(any());
+        verify(alarmService, times(2)).send(eq(alarm.getId()), eq(post.getUser().getId()));
+    }
+
+    @Test
+    void 댓글_작성시_내가쓴_댓글일시_알람_전송없는경우() throws Exception {
+        // given
+        Post post = Fixture.makePostFixture("user1", "title1");
+        Alarm alarm = Fixture.makeAlarmFixture(post.getUser().getUsername(), "name", post.getId());
+        when(userRepository.findByUsername(any())).thenReturn(Optional.of(post.getUser()));
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        when(commentRepository.findById(any())).thenReturn(Optional.of(Fixture.makeCommentFixture(post)));
+        when(alarmRepository.save(any())).thenReturn(alarm);
+        doNothing().when(commentRepository).save(any());
+        // when
+        commentService.writeComment(post.getId(), "user1", "content", PostType.POST);
+        commentService.writeComment(post.getId(), 1L, "user1", "content", PostType.POST);
+        // then
+        verify(alarmRepository, never()).save(any());
+        verify(alarmService, never()).send(eq(alarm.getId()), eq(post.getUser().getId()));
     }
 
     @Test
     void 댓글_작성시_유저가_없는_경우() throws Exception {
         // given
-        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeTeamPostFixture("user1", "title1")));
+        when(postRepository.findById(any())).thenReturn(Optional.of(Fixture.makeTeamPostFixture("user1", "title1", 3.14, 3.14)));
         when(commentRepository.findById(any())).thenReturn(Optional.of(mock(Comment.class)));
         // when then
         assertThatThrownBy(() -> commentService.writeComment(1L, "name", "content", PostType.POST))
@@ -115,7 +141,7 @@ class CommentServiceTest {
     void 댓글_삭제() throws Exception {
         // given
         Post post = Fixture.makePostFixture("user1", "title1");
-        Comment comment = Fixture.commentFixture(post);
+        Comment comment = Fixture.makeCommentFixture(post);
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
         when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         doNothing().when(commentRepository).delete(any());
@@ -128,8 +154,8 @@ class CommentServiceTest {
     @Test
     void 댓글_삭제시_댓글을_적은_유저와_삭제시도_유저가_다른경우() throws Exception {
         // given
-        Post post = Fixture.makeTeamPostFixture("user1", "title1");
-        Comment comment = Fixture.commentFixture(post);
+        Post post = Fixture.makeTeamPostFixture("user1", "title1", 3.14, 3.14);
+        Comment comment = Fixture.makeCommentFixture(post);
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
         when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         // when then
@@ -142,7 +168,7 @@ class CommentServiceTest {
         // given
         Post post = Fixture.makePostFixture("user1", "title1");
         Post post2 = Fixture.makePostFixture("user2", "title2");
-        Comment comment = Fixture.commentFixture(post2);
+        Comment comment = Fixture.makeCommentFixture(post2);
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
         when(commentRepository.findById(any())).thenReturn(Optional.of(comment));
         // when then
