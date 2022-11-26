@@ -13,17 +13,17 @@ import java.util.Optional;
 public class EmitterRepository {
 
     private Map<String, SseEmitter> emitterMap = new HashMap<>();
+    private final static Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
-    public SseEmitter save(Long userId, SseEmitter sseEmitter) {
+    public SseEmitter save(Long userId) {
         final String key = getKey(userId);
+        SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitterMap.put(key, sseEmitter);
-        log.info("Set SseEmitter {}", userId);
         return sseEmitter;
     }
 
     public Optional<SseEmitter> get(Long userId) {
         final String key = getKey(userId);
-        log.info("Set SseEmitter {}", userId);
         return Optional.ofNullable(emitterMap.get(key));
     }
 
