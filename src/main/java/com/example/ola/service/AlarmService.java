@@ -24,8 +24,24 @@ public class AlarmService {
 
     private final EmitterRepository emitterRepository;
     private final AlarmRepository alarmRepository;
-    private final static Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
     private final static String ALARM_NAME = "alarm";
+
+    /**
+     * SseEmitter 연결 : userId를 key 로 연결
+     * @param userId
+     * @return sseEmitter
+     */
+    public SseEmitter connectAlarm(Long userId) {
+        SseEmitter sseEmitter = emitterRepository.save(userId);
+        sseEmitter.onCompletion(() -> emitterRepository.delete(userId));
+        sseEmitter.onTimeout(() -> emitterRepository.delete(userId));
+        try {
+            sseEmitter.send(SseEmitter.event().id("").name("open").data("connect completed"));
+        } catch (IOException e) {
+            throw new OlaApplicationException(ErrorCode.ALARM_CONNECT_ERROR);
+        }
+        return sseEmitter;
+    }
 
     /**
      * SseEmitter 를 통한 알람 전송
@@ -41,25 +57,6 @@ public class AlarmService {
                 throw new OlaApplicationException(ErrorCode.ALARM_CONNECT_ERROR);
             }
         }, () -> log.info("No Emiiter found"));
-    }
-
-    /**
-     * SseEmitter 연결 : userId를 key 로 연결
-     * @param userId
-     * @return sseEmitter
-     */
-    public SseEmitter connectAlarm(Long userId) {
-        SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
-        emitterRepository.save(userId, sseEmitter);
-        sseEmitter.onCompletion(() -> emitterRepository.delete(userId));
-        sseEmitter.onTimeout(() -> emitterRepository.delete(userId));
-
-        try {
-            sseEmitter.send(SseEmitter.event().id("").name("open").data("connect completed"));
-        } catch (IOException e) {
-            throw new OlaApplicationException(ErrorCode.ALARM_CONNECT_ERROR);
-        }
-        return sseEmitter;
     }
 
     /**
@@ -84,5 +81,4 @@ public class AlarmService {
                 .orElseThrow(() -> new OlaApplicationException(ErrorCode.ALARM_NOT_FOUND));
         alarmRepository.remove(alarm);
     }
-
 }
