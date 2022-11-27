@@ -4,6 +4,7 @@ import com.example.ola.dto.PostDto;
 import com.example.ola.dto.request.PostUpdateRequest;
 import com.example.ola.dto.request.PostWriteRequest;
 import com.example.ola.dto.response.MyPageResponse;
+import com.example.ola.dto.response.PostResponse;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.fixture.Fixture;
@@ -20,6 +21,8 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,26 +37,28 @@ class PostControllerTest {
 
     @MockBean private PostService postService;
 
+    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void 일반_게시글_목록_조회() throws Exception {
+    void 내가_작성한_게시물_조회() throws Exception {
         // given
-        when(postService.findAllPostsWithPaging(anyInt(), eq(""))).thenReturn(mock(MyPageResponse.class));
+        when(postService.findPostsByUsername(eq("test1")))
+                .thenReturn(List.of(PostDto.fromPost(Fixture.makePostFixture("test1", "title1"))));
         // when then
-        mockMvc.perform(get("/api/v2/posts")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
+        mockMvc.perform(get("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
                 .andExpect(status().isOk());
     }
 
+    @WithAnonymousUser
     @Test
-    void 일반_게시글_단건_조회() throws Exception {
+    void 내가_작성한_게시물_조회시_권한이_없는경우() throws Exception {
         // given
-        when(postService.findById(any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("user1", "title1", 3.14, 3.14)));
         // when then
-        mockMvc.perform(get("/api/v2/posts/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
