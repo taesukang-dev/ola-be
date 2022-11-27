@@ -47,7 +47,6 @@ class CommentServiceTest {
     @MockBean
     AlarmService alarmService;
 
-    private static MockedStatic<Paging> paging;
 
     @Test
     void 댓글_조회() throws Exception {

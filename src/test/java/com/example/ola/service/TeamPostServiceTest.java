@@ -40,9 +40,6 @@ class TeamPostServiceTest {
     @Autowired TeamPostService teamPostService;
     @MockBean TeamPostRepository teamPostRepository;
     @MockBean UserRepository userRepository;
-    @MockBean CommentRepository commentRepository;
-    @MockBean AlarmService alarmService;
-    @MockBean AlarmRepository alarmRepository;
     private static MockedStatic<Paging> paging;
 
     @BeforeAll
