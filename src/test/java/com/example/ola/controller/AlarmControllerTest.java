@@ -3,7 +3,6 @@ package com.example.ola.controller;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.service.AlarmService;
-import com.example.ola.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
