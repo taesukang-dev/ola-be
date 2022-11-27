@@ -45,9 +45,8 @@ public class TeamPostService {
      */
     public List<TeamPostDto> findTeamPostByLocation(Double x, Double y, int start) {
         return teamPostRepository.findPostsByShortestLocation(x, y, start)
-                .orElseThrow(() -> new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
-                .stream().map(TeamPostDto::fromPost)
-                .collect(Collectors.toList());
+                .map(e -> e.stream().map(TeamPostDto::fromPost).collect(Collectors.toList()))
+                .orElseGet(List::of);
     }
 
     /**
