@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 public class PostController {
     private final PostService postService;
 
+    /**
+     * 내가 작성한 게시글 조회
+     * @param userPrincipal
+     * @return Response<List<PostResponse>>
+     */
     @GetMapping
     public Response<List<PostResponse>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return Response.success(postService.findPostsByUsername(userPrincipal.getUsername())
@@ -26,6 +31,12 @@ public class PostController {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * 게시글 작성
+     * @param postWriteRequest
+     * @param userPrincipal
+     * @return Response<PostResponse>
+     */
     @PostMapping
     public Response<PostResponse> write(
             @RequestBody PostWriteRequest postWriteRequest,
@@ -33,6 +44,12 @@ public class PostController {
         return Response.success(PostResponse.fromPostDto(postService.write(postWriteRequest, userPrincipal.getUsername())));
     }
 
+    /**
+     * 게시글 수정
+     * @param postUpdateRequest
+     * @param userPrincipal
+     * @return Response<PostResponse>
+     */
     @PutMapping
     public Response<PostResponse> update(
             @RequestBody PostUpdateRequest postUpdateRequest,
@@ -40,6 +57,12 @@ public class PostController {
         return Response.success(PostResponse.fromPostDto(postService.updatePost(postUpdateRequest, userPrincipal.getUsername())));
     }
 
+    /**
+     * 게시글 삭제
+     * @param postId
+     * @param userPrincipal
+     * @return Response<Void>
+     */
     @DeleteMapping("/{postId}")
     public Response<Void> removePost(
             @PathVariable Long postId,

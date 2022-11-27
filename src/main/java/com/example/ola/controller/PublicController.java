@@ -18,6 +18,12 @@ public class PublicController {
     private final PostService postService;
     private final TeamPostService teamPostService;
 
+    /**
+     * 게시글 조회
+     * @param page
+     * @param keyword
+     * @return Response<MyPageResponse>
+     */
     @GetMapping
     public Response<MyPageResponse> postList(
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -25,6 +31,13 @@ public class PublicController {
         return Response.success(postService.findAllPostsWithPaging(page, keyword));
     }
 
+    /**
+     * 팀 빌딩 게시글 조회
+     * @param page
+     * @param keyword
+     * @param place
+     * @return Response<MyPageResponse>
+     */
     @GetMapping("/team")
     public Response<MyPageResponse> teamPostList(
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -33,16 +46,31 @@ public class PublicController {
         return Response.success(teamPostService.findAllTeamPostsWithPaging(page, keyword, place));
     }
 
+    /**
+     * 게시글 단건 조회
+     * @param postId
+     * @return Response<PostResponse>
+     */
     @GetMapping("/{postId}")
     public Response<PostResponse> post(@PathVariable Long postId) {
         return Response.success(PostResponse.fromPostDto(postService.findById(postId)));
     }
 
+    /**
+     * 팀 빌딩 게시글 단건 조회
+     * @param postId
+     * @return Response<TeamPostResponse>
+     */
     @GetMapping("/team/{postId}")
     public Response<TeamPostResponse> teamPost(@PathVariable Long postId) {
         return Response.success(TeamPostResponse.fromTeamPostDto(teamPostService.findTeamPostById(postId)));
     }
 
+    /**
+     * 팀 빌딩 게시글 대기열 조회
+     * @param postId
+     * @return Response<List<UserResponse>>
+     */
     @GetMapping("team/{postId}/wait")
     public Response<List<UserResponse>> getWaitList(@PathVariable Long postId) {
         return Response.success(teamPostService.getWaitLists(postId).stream().map(UserResponse::fromUserDto)

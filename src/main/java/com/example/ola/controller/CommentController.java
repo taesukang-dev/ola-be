@@ -21,6 +21,12 @@ import java.util.stream.Collectors;
 public class CommentController {
     private final CommentService commentService;
 
+    /**
+     * 포스트별 댓글 조회
+     * @param postId
+     * @param userPrincipal
+     * @return Response<List<CommentResponse>>
+     */
     @GetMapping("/{postId}/comments")
     public Response<List<CommentResponse>> commentList(
             @PathVariable Long postId,
@@ -30,6 +36,13 @@ public class CommentController {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * 포스트별 댓글 작성
+     * @param commentWriteRequest
+     * @param postId
+     * @param userPrincipal
+     * @return Response<Void>
+     */
     @PostMapping("/{postId}/comments")
     public Response<Void> writeComment(
             @RequestBody CommentWriteRequest commentWriteRequest,
@@ -39,6 +52,14 @@ public class CommentController {
         return Response.success();
     }
 
+    /**
+     * 포스트별 대댓글 작성
+     * @param commentWriteRequest
+     * @param postId
+     * @param parentId
+     * @param userPrincipal
+     * @return Response<Void>
+     */
     @PostMapping("/{postId}/comments/{parentId}")
     public Response<Void> writeCommentWithParent(
             @RequestBody CommentWriteRequest commentWriteRequest,
@@ -49,6 +70,13 @@ public class CommentController {
         return Response.success();
     }
 
+    /**
+     * 포스트별 댓글 삭제
+     * @param postId
+     * @param commentId
+     * @param userPrincipal
+     * @return Response<Void>
+     */
     @DeleteMapping("/{postId}/comments/{commentId}")
     public Response<Void> deleteComments(
             @PathVariable Long postId,

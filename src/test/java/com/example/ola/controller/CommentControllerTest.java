@@ -31,10 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CommentControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-
-    @MockBean
-    private CommentService commentService;
-
+    @MockBean private CommentService commentService;
 
     @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
