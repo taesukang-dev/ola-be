@@ -19,6 +19,11 @@ public class AlarmController {
 
     private final AlarmService alarmService;
 
+    /**
+     * 유저별 알람 조회
+     * @param userPrincipal
+     * @return Response<List<AlarmResponse>>
+     */
     @GetMapping
     public Response<List<AlarmResponse>> alarmList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return Response.success(alarmService.alarms(userPrincipal.getUsername())
@@ -26,6 +31,11 @@ public class AlarmController {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * 알람 삭제
+     * @param alarmId
+     * @return Response<Void>
+     */
     @DeleteMapping("/{alarmId}")
     public Response<Void> deleteAlarm(@PathVariable Long alarmId) {
         alarmService.deleteAlarm(alarmId);
