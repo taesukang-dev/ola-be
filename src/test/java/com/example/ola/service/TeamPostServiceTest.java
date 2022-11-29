@@ -23,6 +23,8 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.transaction.Transactional;
 
@@ -34,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @Slf4j
+@ActiveProfiles("dev")
 @Transactional
 @SpringBootTest
 class TeamPostServiceTest {
