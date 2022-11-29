@@ -1,8 +1,6 @@
 language: java
 jdk:
   - openjdk11
-before_install:
-  - openssl aes-256-cbc -K $encrypted_4a7b01645f68_key -iv $encrypted_4a7b01645f68_iv -in ./src/main/resources/rest.yml.enc -out ./src/main/resources/rest.yml -d
 
 branches:
   only:
@@ -14,3 +12,22 @@ cache:
     - '$HOME/.gradle'
 
 script: "./gradlew clean build -x test"
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_4a7b01645f68_key -iv $encrypted_4a7b01645f68_iv -in ./src/main/resources/rest.yml.enc -out ./src/main/resources/rest.yml -d
+
+before_deploy:
+  - zip -r ola *
+  - mkdir -p deploy
+  - mv ola.zip deploy/ola.zip
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: ola-build
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private
+    local_dir: deploy
+    wait-until-deployed: true
