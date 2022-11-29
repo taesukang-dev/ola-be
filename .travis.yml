@@ -13,6 +13,9 @@ cache:
 
 script: "./gradlew clean build -x test"
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_4a7b01645f68_key -iv $encrypted_4a7b01645f68_iv -in ./rest.yml.enc -out rest.yml -d
+
 before_deploy:
   - mkdir -p before-deploy
   - cp scripts/*.sh before-deploy/
