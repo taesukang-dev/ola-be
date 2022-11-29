@@ -4,9 +4,11 @@ logging:
     org.springframework.web.servlet: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 spring:
-  config:
+  datasource:
+    url: jdbc:mysql://localhost:3306/ola
+    username: tkang
+    password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
-    import: rest.yml
   jpa:
     open-in-view: false
     defer-datasource-initialization: true
@@ -15,8 +17,10 @@ spring:
       hibernate.format_sql: true
       hibernate.show_sql: true
       hibernate.default_batch_fetch_size: 100
-    database: mysql
   sql.init.mode: always
+  profiles:
+    active:
+      on-profile: "dev"
 jwt:
   secret: b2xhLWp3dHNlY3JldGtleXNldHRpbmdzLWl0Z29lc3Rvand0dG9rZW5wcm92aWRlci1pdHdvdWxkYmVsb25nZXItc29pc2F5bWVhbmluZ2xlc3N0aGluZ3M=
   token-validity-in-seconds: 300000000
