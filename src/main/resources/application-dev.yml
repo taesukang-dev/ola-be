@@ -5,9 +5,9 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 spring:
   datasource:
-    url: ${OLA_DATABASE_HOST}:${OLA_DATABASE_PORT}/ola_database
-    username: ${OLA_USER}
-    password: ${OLA_PASSWORD}
+    url: jdbc:mysql://localhost:3306/ola
+    username: tkang
+    password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false
@@ -18,6 +18,9 @@ spring:
       hibernate.show_sql: true
       hibernate.default_batch_fetch_size: 100
   sql.init.mode: always
+  profiles:
+    active:
+      on-profile: "dev"
 jwt:
   secret: b2xhLWp3dHNlY3JldGtleXNldHRpbmdzLWl0Z29lc3Rvand0dG9rZW5wcm92aWRlci1pdHdvdWxkYmVsb25nZXItc29pc2F5bWVhbmluZ2xlc3N0aGluZ3M=
   token-validity-in-seconds: 300000000
