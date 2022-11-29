@@ -36,7 +36,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-@ActiveProfiles("dev")
 @Transactional
 @SpringBootTest
 class TeamPostServiceTest {

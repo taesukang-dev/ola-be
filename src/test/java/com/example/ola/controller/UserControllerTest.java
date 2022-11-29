@@ -6,6 +6,7 @@ import com.example.ola.dto.request.HomeGymRequest;
 import com.example.ola.dto.request.UserLoginRequest;
 import com.example.ola.dto.request.UserRequest;
 import com.example.ola.dto.request.UserUpdateRequest;
+import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.fixture.Fixture;
@@ -27,12 +28,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("dev")
 @AutoConfigureMockMvc
 @SpringBootTest
 class UserControllerTest {
@@ -42,12 +43,11 @@ class UserControllerTest {
     @MockBean UserService userService;
     @MockBean AlarmService alarmService;
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 유저_정보_조회() throws Exception {
         // given
         // when then
-        mockMvc.perform(get("/api/v1/users")
+        mockMvc.perform(get("/api/v1/users").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -129,7 +129,6 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 유저_정보_수정() throws Exception {
         // given
@@ -151,14 +150,13 @@ class UserControllerTest {
                 .thenReturn(UserDto.fromUser(Fixture.makeUserFixture("user1", "name1")));
 
         // when then
-        mockMvc.perform(post("/api/v1/users/update")
+        mockMvc.perform(post("/api/v1/users/update").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 유저_정보_수정시_유저가_없는경우() throws Exception {
         // given
@@ -180,34 +178,32 @@ class UserControllerTest {
                 .when(userService).updateUser(anyString(), any());
 
         // when then
-        mockMvc.perform(post("/api/v1/users/update")
+        mockMvc.perform(post("/api/v1/users/update").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void Sse_구독() throws Exception {
         // given
         when(alarmService.connectAlarm(any()))
                 .thenReturn(new SseEmitter());
         // when then
-        mockMvc.perform(get("/api/v1/users/alarm/subscribe?token=temp")
+        mockMvc.perform(get("/api/v1/users/alarm/subscribe?token=temp").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void Sse_구독에_실패한_경우() throws Exception {
         // given
         doThrow(new OlaApplicationException(ErrorCode.ALARM_CONNECT_ERROR))
                 .when(alarmService).connectAlarm(any());
         // when then
-        mockMvc.perform(get("/api/v1/users/alarm/subscribe?token=temp")
+        mockMvc.perform(get("/api/v1/users/alarm/subscribe?token=temp").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isInternalServerError());

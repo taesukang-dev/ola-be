@@ -5,9 +5,9 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 spring:
   datasource:
-    url: ${OLA_DATABASE_HOST}:${OLA_DATABASE_PORT}/ola_database
-    username: ${OLA_USER}
-    password: ${OLA_PASSWORD}
+    url: jdbc:mysql://localhost:3306/ola
+    username: tkang
+    password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false

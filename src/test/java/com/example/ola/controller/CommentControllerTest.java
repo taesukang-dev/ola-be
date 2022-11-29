@@ -2,8 +2,10 @@ package com.example.ola.controller;
 
 import com.example.ola.dto.request.CommentWriteRequest;
 import com.example.ola.dto.request.PostType;
+import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
+import com.example.ola.fixture.Fixture;
 import com.example.ola.service.CommentService;
 import com.example.ola.service.TeamPostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,11 +25,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("dev")
 @AutoConfigureMockMvc
 @SpringBootTest
 class CommentControllerTest {
@@ -35,13 +37,12 @@ class CommentControllerTest {
     @Autowired private ObjectMapper objectMapper;
     @MockBean private CommentService commentService;
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_조회() throws Exception {
         // given
         // when
         // then
-        mockMvc.perform(get("/api/v1/posts/1/comments")
+        mockMvc.perform(get("/api/v1/posts/1/comments").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isOk());
@@ -59,7 +60,6 @@ class CommentControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_작성() throws Exception {
         // given
@@ -69,14 +69,13 @@ class CommentControllerTest {
                 .build();
         // when
         // then
-        mockMvc.perform(post("/api/v1/posts/1/comments")
+        mockMvc.perform(post("/api/v1/posts/1/comments").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
                 .andExpect(status().isOk());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 대댓글_작성() throws Exception {
         // given
@@ -86,7 +85,7 @@ class CommentControllerTest {
                 .build();
         // when
         // then
-        mockMvc.perform(post("/api/v1/posts/1/comments/1")
+        mockMvc.perform(post("/api/v1/posts/1/comments/1").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -110,7 +109,6 @@ class CommentControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_작성시_게시글이_없는_경우() throws Exception {
         // given
@@ -121,14 +119,13 @@ class CommentControllerTest {
         doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .when(commentService).writeComment(any(), any(),any(), any());
         // when then
-        mockMvc.perform(post("/api/v1/posts/1/comments")
+        mockMvc.perform(post("/api/v1/posts/1/comments").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
                 .andExpect(status().isNotFound());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 대댓글_작성시_부모_댓글이_없는경우() throws Exception {
         // given
@@ -141,46 +138,43 @@ class CommentControllerTest {
                 .when(commentService).writeComment(any(), any(),any(), any(), any());
         // when
         // then
-        mockMvc.perform(post("/api/v1/posts/99/comments/99")
+        mockMvc.perform(post("/api/v1/posts/99/comments/99").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
                 .andExpect(status().isNotFound());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_삭제() throws Exception {
         // given
         // when
         // then
-        mockMvc.perform(delete("/api/v1/posts/1/comments/2")
+        mockMvc.perform(delete("/api/v1/posts/1/comments/2").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isOk());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_삭제시_게시글이_없는_경우() throws Exception {
         // given
         doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .when(commentService).deleteComment(any(), any(),any());
         // when then
-        mockMvc.perform(delete("/api/v1/posts/1/comments/2")
+        mockMvc.perform(delete("/api/v1/posts/1/comments/2").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isNotFound());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 댓글_삭제시_유저가_다른_경우() throws Exception {
         // given
         doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
                 .when(commentService).deleteComment(any(), any(),any());
         // when then
-        mockMvc.perform(delete("/api/v1/posts/1/comments/2")
+        mockMvc.perform(delete("/api/v1/posts/1/comments/2").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());

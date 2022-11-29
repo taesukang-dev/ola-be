@@ -1,10 +1,12 @@
 package com.example.ola.controller;
 
+import com.example.ola.domain.Post;
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.request.PostUpdateRequest;
 import com.example.ola.dto.request.PostWriteRequest;
 import com.example.ola.dto.response.MyPageResponse;
 import com.example.ola.dto.response.PostResponse;
+import com.example.ola.dto.security.UserPrincipal;
 import com.example.ola.exception.ErrorCode;
 import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.fixture.Fixture;
@@ -26,11 +28,11 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("dev")
 @AutoConfigureMockMvc
 @SpringBootTest
 class PostControllerTest {
@@ -39,14 +41,13 @@ class PostControllerTest {
 
     @MockBean private PostService postService;
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 내가_작성한_게시물_조회() throws Exception {
         // given
         when(postService.findPostsByUsername(eq("test1")))
                 .thenReturn(List.of(PostDto.fromPost(Fixture.makePostFixture("test1", "title1"))));
         // when then
-        mockMvc.perform(get("/api/v1/posts")
+        mockMvc.perform(get("/api/v1/posts").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isOk());
@@ -63,7 +64,6 @@ class PostControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 일반_게시물_작성() throws Exception {
         // given
@@ -73,10 +73,11 @@ class PostControllerTest {
                 .username("test1")
                 .imgUri("img")
                 .build();
+        Post post = Fixture.makePostFixture("test1", "title1");
         when(postService.write(any(), eq("test1")))
-                .thenReturn(PostDto.fromPost(Fixture.makePostFixture("test1", "title1")));
+                .thenReturn(PostDto.fromPost((post)));
         // when then
-        mockMvc.perform(post("/api/v1/posts")
+        mockMvc.perform(post("/api/v1/posts").with(user(UserPrincipal.fromUser(post.getUser())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
@@ -101,7 +102,6 @@ class PostControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 일반_게시물_수정() throws Exception {
         // given
@@ -109,14 +109,13 @@ class PostControllerTest {
 
         when(postService.updatePost(any(), any())).thenReturn(PostDto.fromPost(Fixture.makeTeamPostFixture("test1", "title1", 3.14, 3.14)));
         // when then
-        mockMvc.perform(put("/api/v1/posts")
+        mockMvc.perform(put("/api/v1/posts").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param)))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 일반_게시물_수정시_자신의_게시글이_아닌경우() throws Exception {
         // given
@@ -125,14 +124,13 @@ class PostControllerTest {
         doThrow(new OlaApplicationException(ErrorCode.UNAUTHORIZED_BEHAVIOR))
                 .when(postService).updatePost(any(), any());
         // when then
-        mockMvc.perform(put("/api/v1/posts")
+        mockMvc.perform(put("/api/v1/posts").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 일반_게시물_수정시_게시글이_없는경우() throws Exception {
         // given
@@ -141,17 +139,16 @@ class PostControllerTest {
         doThrow(new OlaApplicationException(ErrorCode.POST_NOT_FOUND))
                 .when(postService).updatePost(any(), any());
         // when then
-        mockMvc.perform(put("/api/v1/posts")
+        mockMvc.perform(put("/api/v1/posts").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!"))))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(param))
                 ).andDo(print())
                 .andExpect(status().isNotFound());
     }
 
-    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     void 일반_게시물_삭제() throws Exception {
-        mockMvc.perform(delete("/api/v1/posts/1"))
+        mockMvc.perform(delete("/api/v1/posts/1").with(user(UserPrincipal.fromUser(Fixture.makeUserFixture("user1", "1q2w3e4r!!")))))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -173,6 +170,4 @@ class PostControllerTest {
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
-
-
 }

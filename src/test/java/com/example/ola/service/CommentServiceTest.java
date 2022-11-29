@@ -33,7 +33,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("dev")
+
 @Transactional
 @SpringBootTest
 class CommentServiceTest {
