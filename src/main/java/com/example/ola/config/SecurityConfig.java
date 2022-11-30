@@ -50,7 +50,8 @@ public class SecurityConfig {
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .mvcMatchers(
                                         HttpMethod.GET,
-                                        "/api/v2/posts/**"
+                                        "/api/v2/posts/**",
+                                        "/"
                                 ).permitAll()
                                 .mvcMatchers(
                                         HttpMethod.POST,
