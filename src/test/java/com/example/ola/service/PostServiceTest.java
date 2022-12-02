@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("dev")
 @Transactional
 @SpringBootTest
 class PostServiceTest {
