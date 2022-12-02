@@ -59,6 +59,7 @@
 > 덕분에 ec2의 안정과 더불어 Cloud Watch로 모니터링을 간편하게 구축할 수 있었음
 
 <br />
+<br />
 
 ` ❓ 테스트 중 Static Method Class에 대한 Mocking이 애매하던 상황`
 
@@ -66,6 +67,7 @@
 > Static Method Class에 대해 beforeAll과 AfterAll을 통해 매 테스트마다 목킹하여 영향을 받이 않아야 할 테스트에서도 영향을 받았던 상황 <br />
 > try 구문을 통해 원하는 때에만 목킹할 수 있었음
 
+<br />
 <br />
 
 ` ❓ 테스트 중 Entity Class를 목킹하며 실제 값이 없어 Null Pointer Exception이 나던 상황`
@@ -75,6 +77,7 @@
 > 다른 Mock Bean과 마찬가지로 함수가 불리면 값을 리턴해주게 하여 null pointer exception 을 피하고, 원하는 결과를 확인할 수 있었음
 
 <br />
+<br />
 
 ` ❓ 게시글 조회시 N + 1 문제와 더불어 쿼리가 여러번 나가던 상황`
 
@@ -83,6 +86,16 @@
 > 수정과 삭제가 잦지 않은 엔티티는 인덱싱 또한 하였음 <br />
 > 응답시간을 약 300ms -> 약 50ms 까지 낮출 수 있었음
 
+- 적용 전
+
+<img width="333" alt="join_fetch1" src="https://user-images.githubusercontent.com/44432418/205297613-baf2b6e2-a6cb-437c-aa8c-553c7dac1b99.png">
+
+- 적용 후
+
+<img width="333" alt="join_fetch2" src="https://user-images.githubusercontent.com/44432418/205297623-2a908d01-15a3-4892-8e48-603b43c52d27.png">
+
+
+<br />
 <br />
 
 ` ❓ 위치정보를 불러오면서 HTTP 통신이라 확인이 안 되었던 상황`
