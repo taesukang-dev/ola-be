@@ -96,7 +96,6 @@ public class TeamPostRepository {
     public TeamMember findTeamMemberByPostIdAndUserId(Long postId, Long userId) {
         return em.createQuery("select m from TeamMember m" +
                         " where m.post.id=:postId" +
-                        " where m.post.id=:postId" +
                         " and m.user.id=:userId" +
                         " and m.deletedAt is null", TeamMember.class)
                 .setParameter("postId", postId)
