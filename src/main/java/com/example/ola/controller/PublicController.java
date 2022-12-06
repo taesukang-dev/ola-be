@@ -1,5 +1,6 @@
 package com.example.ola.controller;
 
+import com.example.ola.dto.request.RecommendRequest;
 import com.example.ola.dto.response.*;
 import com.example.ola.service.PostService;
 import com.example.ola.service.TeamPostService;
@@ -75,5 +76,15 @@ public class PublicController {
     public Response<List<UserResponse>> getWaitList(@PathVariable Long postId) {
         return Response.success(teamPostService.getWaitLists(postId).stream().map(UserResponse::fromUserDto)
                 .collect(Collectors.toList()));
+    }
+
+    /**
+     * 추천 게시물 og 이미지 리스트 반환
+     * @param request
+     * @return Response<List<String>>
+     */
+    @PostMapping("/recommend")
+    public Response<List<String>> recommendPost(@RequestBody RecommendRequest request) {
+        return Response.success(postService.getRecommendPosts(request.getUrls()));
     }
 }
