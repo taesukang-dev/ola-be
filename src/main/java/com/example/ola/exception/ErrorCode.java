@@ -18,6 +18,7 @@ public enum ErrorCode {
     ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting alarm occurs Error"),
     INVALID_KEYWORD(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid keyword"),
     MEMBERS_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "Not enough members"),
+    DOCUMENT_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Document connect error"),
     ;
 
     private HttpStatus status;
