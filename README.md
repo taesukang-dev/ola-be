@@ -103,3 +103,12 @@
 > ❗ Cloud Front를 통해 HTTPS 통신을 지원하며 해결 <br />
 > Geolocation.getCurrentPosition 가 HTTP 에서는 보안의 문제로 지원하지 않았던 상황 <br />
 > 배포하면서, 클라이언트와 서버 모두 HTTPS 를 지원하며 해결하였음
+
+<br />
+<br />
+
+` ❓ 추천 게시글을 크롤링하며 네이버 블로그에서는 meta 태그를 찾을 수 없었던 경우`
+
+> ❗ iframe 내 실제 주소를 통해 새로 연결시켜 해결 <br />
+> Html 내부에 iframe 으로 포함되어 있어 크롤러가 찾지 못했던 상황 <br />
+> iframe 의 src 항목을 찾아 실제 주소로 다시 크롤링을 진행하여 해결할 수 있었음
