@@ -2,7 +2,7 @@ package com.example.ola.controller;
 
 import com.example.ola.dto.PostDto;
 import com.example.ola.dto.TeamPostDto;
-import com.example.ola.dto.request.TeamPostWriteRequest;
+import com.example.ola.dto.request.RecommendRequest;
 import com.example.ola.dto.response.MyPageResponse;
 import com.example.ola.fixture.Fixture;
 import com.example.ola.service.PostService;
@@ -14,8 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -130,4 +128,16 @@ class PublicControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void 추천_게시물_조회() throws Exception {
+        // given
+        RecommendRequest param = new RecommendRequest(List.of("1", "2"));
+        when(postService.getRecommendPosts(any())).thenReturn(List.of());
+        // when then
+        mockMvc.perform(post("/api/v2/posts/recommend")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(param)))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
 }
