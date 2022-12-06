@@ -19,7 +19,7 @@
 
 ## ℹ Information
 
-![information](https://user-images.githubusercontent.com/44432418/205283025-afa33681-06b6-4627-940f-54c02f355fab.jpg)
+![information drawio](https://user-images.githubusercontent.com/44432418/205926315-30f4d7dc-d856-484d-b682-d2abcd60d9ba.png)
 
 <br />
 
