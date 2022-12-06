@@ -11,6 +11,7 @@ import com.example.ola.repository.AlarmRepository;
 import com.example.ola.repository.CommentRepository;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
+import com.example.ola.utils.Crawler;
 import com.example.ola.utils.Paging;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -132,6 +133,16 @@ public class PostService {
         postRepository.remove(post);
         commentRepository.deleteByPostId(postId);
         alarmRepository.deleteByPostId(postId);
+    }
+
+    /**
+     * 추천 게시물 url로 <meta property="og:image"/> 태그 크롤링
+     * @param urls
+     * @return List<String>
+     */
+    public List<String> getRecommendPosts(List<String> urls) {
+         return urls.stream().map(Crawler::imgCrawler)
+                .collect(Collectors.toList());
     }
 
     private Post getPostByIdOrElseThrow(Long postId) {

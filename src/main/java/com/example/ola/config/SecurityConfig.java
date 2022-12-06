@@ -54,7 +54,8 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .mvcMatchers(
                                         HttpMethod.POST,
-                                        "/api/v1/users/**"
+                                        "/api/v1/users/**",
+                                        "/api/v2/posts/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

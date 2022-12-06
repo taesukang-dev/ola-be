@@ -10,6 +10,7 @@ import com.example.ola.exception.OlaApplicationException;
 import com.example.ola.fixture.Fixture;
 import com.example.ola.repository.PostRepository;
 import com.example.ola.repository.UserRepository;
+import com.example.ola.utils.Crawler;
 import com.example.ola.utils.Paging;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,10 +19,10 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -247,5 +248,33 @@ class PostServiceTest {
         // then
         assertThatThrownBy(() -> postService.delete(1L, "asd"))
                 .isInstanceOf(OlaApplicationException.class);
+    }
+
+    @Test
+    void 추천_게시물_이미지_크롤링() throws Exception {
+        try (MockedStatic<Crawler> crawlerMockedStatic = mockStatic(Crawler.class)){
+            when(Crawler.imgCrawler(any())).thenReturn("1");
+            List<String> recommendPosts = postService.getRecommendPosts(List.of("https://liltdevs.tistory.com/97", "https://liltdevs.tistory.com/97"));
+            assertThat(recommendPosts.size()).isEqualTo(2);
+        }
+    }
+
+    @Test
+    void 추천_게시물_이미지_크롤링_네이버_블로그일경우() throws Exception {
+        try (MockedStatic<Crawler> crawlerMockedStatic = mockStatic(Crawler.class)){
+            when(Crawler.imgCrawler(any())).thenReturn("1");
+            List<String> recommendPosts = postService.getRecommendPosts(List.of("https://blog.naver.com/dada1979/222947574674", "https://liltdevs.tistory.com/97"));
+            assertThat(recommendPosts.size()).isEqualTo(2);
+        }
+    }
+
+    @Test
+    void 추천_게시물_이미지_크롤링시_게시글이_없는_경우() throws Exception {
+        try (MockedStatic<Crawler> crawlerMockedStatic = mockStatic(Crawler.class)){
+            when(Crawler.imgCrawler(anyString())).thenReturn("");
+            List<String> recommendPosts = postService.getRecommendPosts(List.of("", ""));
+            assertThat(recommendPosts.size()).isEqualTo(2);
+            assertThat(recommendPosts.get(0)).isEqualTo("");
+        }
     }
 }
